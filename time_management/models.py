@@ -2,31 +2,14 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField, DateRangeField
 
+from employees.models import Employee
 from . import ActivityStatus
-# from .managers import EmployeeManager
-
-class Company(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class Employee(models.Model):
-    company = models.ForeignKey(
-        Company, related_name='employees', on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255)
-    chat_id = models.BigIntegerField(unique=True)
-
-    # objects = EmployeeManager()
-
-    def __str__(self):
-        return f"{self.full_name}"
 
 
 class EmployeeActivity(models.Model):
     class Meta:
         ordering = ("-date", )
+
     employee = models.ForeignKey(
         Employee, related_name='activity', on_delete=models.CASCADE)
     start_time = models.TimeField(null=True, blank=True)
@@ -54,3 +37,34 @@ class EmployeeActivity(models.Model):
 
     def __str__(self):
         return f"{self.employee.full_name} - {self.date}"
+
+
+class Holiday(models.Model):
+    """
+    Model to store holiday data.
+    """
+    name = models.CharField("Наименование", max_length=255)
+    dates = DateRangeField("Даты С-По")
+
+    class Meta:
+        verbose_name = "Праздник"
+        verbose_name_plural = "Праздники"
+
+    def __str__(self):
+        return self.name
+
+
+class HolidayMoved(models.Model):
+    """
+    If saturday or sunday moved to another day, it should be saved in moved_from field
+    """
+    holiday = models.ForeignKey(
+        verbose_name="Праздник", to=Holiday, on_delete=models.CASCADE)
+    moved_from = models.DateField("Перенесен с")
+
+    class Meta:
+        verbose_name = "Перенесенная дата"
+        verbose_name_plural = "Перенесенные даты"
+
+    def __str__(self):
+        return f"{self.holiday.name} - {self.moved_from}"

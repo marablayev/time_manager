@@ -4,8 +4,9 @@ import logging
 from django.conf import settings
 from django.utils import timezone
 
+from employees.models import Employee, Company
 from time_management import ActivityStatus
-from time_management.models import Employee, Company, EmployeeActivity
+from time_management.models import EmployeeActivity
 from telegram import (
     ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup,
     InputMediaPhoto, ReplyKeyboardRemove, error as TelegramError, BotCommand)

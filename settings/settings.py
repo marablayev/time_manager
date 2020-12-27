@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
+
     'time_management',
-    'django_crontab'
+    'employees',
+
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -129,3 +133,5 @@ BOT_TOKEN = os.getenv('BOT_TOKEN', '1364558817:AAGUi1djFbx2YoX26XTnpXLYk3745Oa9b
 CRONJOBS = [
     ('*/50 * * * *', 'django.core.management.call_command', ['notify_users']),
 ]
+
+PHONENUMBER_DB_FORMAT='E164'

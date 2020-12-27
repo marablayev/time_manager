@@ -5,8 +5,11 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib import admin
 from django.http import HttpResponse
+from django.contrib.admin.widgets import AdminDateWidget
+from django.contrib.postgres.fields import DateRangeField
+from django.contrib.postgres.forms.ranges import RangeWidget
 
-from .models import Company, Employee, EmployeeActivity
+from time_management.models import EmployeeActivity, Holiday, HolidayMoved
 
 
 
@@ -24,11 +27,9 @@ def write_to_xlxs(modeladmin, request, queryset):
 
     monthrange = calendar.monthrange(current_date.year, current_date.month)
     days = []
-    print(monthrange, current_date.year, current_date.month)
     for day in range(1, monthrange[1] + 1):
         date = current_date.replace(day=day)
         days.append(date.strftime('%m/%d/%Y'))
-        print(date)
 
 
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -102,6 +103,18 @@ class EmployeeActivityAdmin(admin.ModelAdmin):
     #     return super(EmployeeActivityAdmin, self).changelist_view(request, extra_context)
 
 
-admin.site.register(Company)
-admin.site.register(Employee)
+class HolidayMovedInline(admin.TabularInline):
+    model = HolidayMoved
+    extra = 1
+
+
+class HolidayAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'dates')
+    inlines = (HolidayMovedInline, )
+    formfield_overrides = {
+        DateRangeField: {'widget': RangeWidget(AdminDateWidget())},
+    }
+
+
+admin.site.register(Holiday, HolidayAdmin)
 admin.site.register(EmployeeActivity, EmployeeActivityAdmin)

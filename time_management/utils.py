@@ -1,13 +1,31 @@
 import calendar
-import xlsxwriter
 from datetime import datetime, timedelta
 
 from django.utils import timezone
 
-from time_management.models import Employee, EmployeeActivity
+from time_management.models import HolidayMoved, Holiday
 
 
-def calculate_hours(start, end):
+def is_holiday(date=timezone.localdate()):
+
+    is_holiday = Holiday.objects.filter(dates__contains=date).exists()
+    is_moved = HolidayMoved.objects.filter(moved_from=date).exists()
+
+    is_holiday = is_holiday or not 0 <= date.weekday() < 5
+
+    return is_holiday and not is_moved
+
+
+def calculate_total_hours(date=None, day_till=None, day_from=None):
+    date = timezone.localdate() if date is None else date
+    monthrange = calendar.monthrange(date.year, date.month)
+    day_till = monthrange[1] if day_till is None else day_till
+    day_from = 1 if day_from is None else day_from
+
+    return sum(8 for d in range(day_from, day_till + 1) if not is_holiday(date.replace(day=d)))
+
+
+def calculate_work_hours(start, end):
     if start and end:
         start, end = [datetime.combine(datetime.min, t) for t in [start, end]]
         diff = end - start
@@ -15,59 +33,29 @@ def calculate_hours(start, end):
     return timedelta(0)
 
 
-def write_to_xlxs(from_date=None, to_date=None):
-    current_date = timezone.localdate()
-    employees = Employee.objects.all().order_by('company')
+def get_worked_hours(employee, date=None, day_till=None, day_from=None):
+    date = timezone.localdate() if date is None else date
+    monthrange = calendar.monthrange(date.year, date.month)
+    day_till = monthrange[1] if day_till is None else day_till
+    day_from = 1 if day_from is None else day_from
+    activities = employee.activities.filter(date__month=date.month)
+    return [calculate_work_hours(act.start_time, act.finish_time) for act in activities]
 
-    monthrange = calendar.monthrange(current_date.year, current_date.month)
-    days = []
-    for day in range(monthrange[0], monthrange[1] + 1):
-        date = current_date.replace(day=day)
-        days.append(date.strftime('%m/%d/%Y'))
 
-    # Start writing to file
-    workbook = xlsxwriter.Workbook('time_manager.xlsx')
-    worksheet = workbook.add_worksheet()
-    bold = workbook.add_format({'bold': True})
-    header_date_format = workbook.add_format()
-    merge_format = workbook.add_format()
-    merge_format.set_align('center')
-    user_format = workbook.add_format()
-    row = 0
-    col = 2
-    for day in days:
-        worksheet.write(row, col, day, header_date_format)
-        col += 1
+def get_stats(employees=[], date=None):
+    date = timezone.localdate() if date is None else date
+    total_hours_till_today = calculate_total_hours(date, day_till=date.day)
+    total_hours_for_month = calculate_total_hours(date)
+    resp = []
 
-    worksheet.write(row, col, 'Итого', header_date_format)
-
-    companies = []
-    row = 1
-    col = 2
     for employee in employees:
-        activities = EmployeeActivity.objects.filter(
-                        employee=employee, date__month=current_date.month)
-        activities_dict = {
-            a.date.strftime('%m/%d/%Y'): a for a in activities
-        }
-        total_hours = timedelta(0)
-        if employee.company.id not in companies:
-            worksheet.merge_range(row, 0, row, 1, employee.company.name, merge_format)
-            companies.append(employee.company.id)
-            row += 1
-        worksheet.write(row, 0, employee.full_name, user_format)
-        for day in days:
-            activity = activities_dict.get(day)
-            if activity:
-                start, end = activity.start_time, activity.finish_time
-            else:
-                start, end = None, None
-            value = calculate_hours(start, end)
-            total_hours += timedelta(seconds=value.total_seconds())
-            worksheet.write(row, col, str(value))
-            col += 1
-        worksheet.write(row, col, str(total_hours))
-        col = 2
-        row += 1
 
-    workbook.close()
+        resp_data = {
+            "employee_id": employee.id
+            "total_hours_till_today": total_hours_till_today,
+            "total_hours_for_month": total_hours_for_month,
+            "extra_hours": 0,
+            "missing_hours": 0,
+            "total_worked_hours": get_worked_hours(employee, date=date, day_till=date.day),
+            "absent": 0
+        }

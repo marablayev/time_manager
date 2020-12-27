@@ -19,6 +19,8 @@ from django.conf import settings
 
 from bot.bot import bot_init
 
+admin.site.enable_nav_sidebar = False
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
