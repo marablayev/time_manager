@@ -1,6 +1,7 @@
 from django.db import models
 
 from phonenumber_field.modelfields import PhoneNumberField
+from . import EmployeeRoles
 
 
 def employee_photo_path(instance, filename):
@@ -13,7 +14,6 @@ class Company(models.Model):
         verbose_name_plural = "Компании/Отделы"
 
     name = models.CharField(max_length=255)
-    bot_token = models.CharField(max_length=255)
     parent = models.ForeignKey(
         "self",
         related_name="child_companies",
@@ -38,6 +38,8 @@ class Employee(models.Model):
 
     company = models.ForeignKey(
         Company, related_name='employees', on_delete=models.PROTECT)
+    role = models.CharField(
+        max_length=255, default=EmployeeRoles.EMPLOYEE, choices=EmployeeRoles.choices)
     full_name = models.CharField(max_length=255)
     chat_id = models.BigIntegerField(null=True, blank=True)
     phone = PhoneNumberField(unique=True)

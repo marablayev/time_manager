@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'time_management',
     'employees',
+    'event_management',
 
     'django_extensions'
 ]
