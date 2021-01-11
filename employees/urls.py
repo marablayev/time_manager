@@ -5,8 +5,8 @@ from .views import EmployeeModelViewSet, CompanyModelViewSet
 
 
 router = DefaultRouter()
-router.register("", EmployeeModelViewSet)
 router.register("companies", CompanyModelViewSet)
+router.register("", EmployeeModelViewSet)
 
 urlpatterns = [
     path("", include(router.urls))

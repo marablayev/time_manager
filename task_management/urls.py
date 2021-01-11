@@ -5,8 +5,8 @@ from .views import TaskModelViewSet, TaskConfirmationModelViewSet
 
 
 router = DefaultRouter()
-router.register("", TaskModelViewSet)
 router.register("confirmations", TaskConfirmationModelViewSet)
+router.register("", TaskModelViewSet)
 
 urlpatterns = [
     path("", include(router.urls))

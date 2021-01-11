@@ -5,8 +5,8 @@ from .views import EventModelViewSet, EventConfirmationModelViewSet
 
 
 router = DefaultRouter()
-router.register("", EventModelViewSet)
 router.register("confirmations", EventConfirmationModelViewSet)
+router.register("", EventModelViewSet)
 
 urlpatterns = [
     path("", include(router.urls))
