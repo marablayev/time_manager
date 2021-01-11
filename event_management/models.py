@@ -15,7 +15,8 @@ class Event(models.Model):
         on_delete=models.CASCADE
     )
     all_employees = models.BooleanField(default=False)
-    employees_to_notify = models.ManyToManyField(Employee, related_name="employees")
+    employees_to_notify = models.ManyToManyField(
+        Employee, related_name="events_in_notification")
     employees_notified = models.BooleanField(default=False)
     date_time = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
