@@ -60,8 +60,12 @@ class CoreHandler:
         keyboard = [
             shift_change_keys,
             [
-                KeyboardButton(self.reply_manager.get_message('my_stats_button')),#'Моя статистика'),
-                KeyboardButton(self.reply_manager.get_message('profile_button'))#'Профиль')
+                KeyboardButton(self.reply_manager.get_message('my_stats_button')),#'Выбрать действие'), < ==== # Создать задачу
+                                                                                                             # Создать событие
+                KeyboardButton(self.reply_manager.get_message('profile_button'))#'Профиль(0)') <===# Статистика
+                                                                                                # Мои задачи(0)
+                                                                                                # Мои События(0)
+                                                                                                # Изменить профиль < === Телефон, Имя фамилия, Компания
             ],
         ]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
