@@ -8,6 +8,8 @@ from . import ActivityStatus
 
 class EmployeeActivity(models.Model):
     class Meta:
+        verbose_name = "Активность сотрудника"
+        verbose_name_plural = "Активность сотрудников"
         unique_together = ("employee", "date")
         ordering = ("-date", )
 

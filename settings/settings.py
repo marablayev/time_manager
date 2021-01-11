@@ -127,6 +127,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
+MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(BASE_DIR, "media/"))
+
 BOT_TOKEN = os.getenv('BOT_TOKEN', '1364558817:AAGUi1djFbx2YoX26XTnpXLYk3745Oa9bOs')
 
 
