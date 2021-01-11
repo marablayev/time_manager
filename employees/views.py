@@ -1,12 +1,33 @@
 from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.generics import get_object_or_404
 
 from .models import Employee, Company
-from .serializers import EmployeeSerializer, CompanySerializer
+from .serializers import EmployeeSerializer, CompanySerializer, EmployeePhotoUploadSerializer
 
 
 class EmployeeModelViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+
+
+class EmployeePhotoUploadView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def put(self, request, pk=None, *args, **kwargs):
+        obj = get_object_or_404(Employee, id=pk)
+        context = {"request": request}
+        serializer = EmployeePhotoUploadSerializer(
+            obj,
+            data=request.data,
+            context=context
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        resp_serializer = EmployeeSerializer(instance, context=context)
+        return Response(resp_serializer.data, status=200)
 
 
 class CompanyModelViewSet(viewsets.ModelViewSet):
