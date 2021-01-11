@@ -38,8 +38,20 @@ def get_worked_hours(employee, date=None, day_till=None, day_from=None):
     monthrange = calendar.monthrange(date.year, date.month)
     day_till = monthrange[1] if day_till is None else day_till
     day_from = 1 if day_from is None else day_from
-    activities = employee.activities.filter(date__month=date.month)
-    return [calculate_work_hours(act.start_time, act.finish_time) for act in activities]
+    activities = employee.activities.filter(
+        date__month=date.month,
+        date__day__gte=day_from,
+        date__day__lte=day_till
+    )
+
+    worked_hours = []
+    for day in range(day_from, day_till + 1):
+        act = activities.filter(date__day=day).first()
+        start, finish = None, None
+        if act:
+            start, finish = act.start_time, act.finish_time
+        worked_hours.append(calculate_work_hours(start, finish))
+    return sum(round(h.seconds / 3600, 2) for h in worked_hours)
 
 
 def get_stats(employees=[], date=None):
@@ -49,13 +61,18 @@ def get_stats(employees=[], date=None):
     resp = []
 
     for employee in employees:
+        worked_hours = get_worked_hours(employee, date=date, day_till=date.day)
+        diff_hours = total_hours_till_today - worked_hours
 
         resp_data = {
-            "employee_id": employee.id
+            "employee_id": employee.id,
             "total_hours_till_today": total_hours_till_today,
             "total_hours_for_month": total_hours_for_month,
-            "extra_hours": 0,
-            "missing_hours": 0,
-            "total_worked_hours": get_worked_hours(employee, date=date, day_till=date.day),
+            "extra_hours": abs(diff_hours) if diff_hours < 0 else 0,
+            "missing_hours": abs(diff_hours) if diff_hours > 0 else 0,
+            "total_worked_hours": worked_hours,
             "absent": 0
         }
+        resp.append(resp_data)
+
+    return resp

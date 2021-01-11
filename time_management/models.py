@@ -8,10 +8,11 @@ from . import ActivityStatus
 
 class EmployeeActivity(models.Model):
     class Meta:
+        unique_together = ("employee", "date")
         ordering = ("-date", )
 
     employee = models.ForeignKey(
-        Employee, related_name='activity', on_delete=models.CASCADE)
+        Employee, related_name='activities', on_delete=models.CASCADE)
     start_time = models.TimeField(null=True, blank=True)
     finish_time = models.TimeField(null=True, blank=True)
     date = models.DateField(default=timezone.localdate, editable=False)
