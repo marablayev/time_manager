@@ -39,12 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_crontab',
     'drf_spectacular',
+    'rest_framework',
 
     'time_management',
     'employees',
     'event_management',
     'task_management',
-    'rest_framework',
+    'bot',
 
     'django_extensions'
 ]

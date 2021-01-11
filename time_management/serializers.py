@@ -6,7 +6,8 @@ from .models import EmployeeActivity, Holiday
 class EmployeeActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeActivity
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ("pauses", )
 
 
 class HolidaySerializer(serializers.ModelSerializer):

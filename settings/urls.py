@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/activity/', include('time_management.urls')),
     path('api/tasks/', include('task_management.urls')),
     path('api/employees/', include('employees.urls')),
+    path('api/telegram/', include('bot.urls')),
     
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
