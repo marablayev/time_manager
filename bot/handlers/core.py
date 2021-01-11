@@ -126,6 +126,10 @@ class CoreHandler:
                 self.reply_manager.get_message('undefined_cmd_msg'),
                 parse_mode='HTML',)
 
-    def notifier(self, chat_id, message, image=None, markup_name=None, markup_kwargs={}):
-        markup = get_markup(markup_name, **markup_kwargs)
-        self.bot.send_message(chat_id, text=message, reply_markup=markup)
+    def notifier(self, chat_id, message="", image=None, markup=None):
+        if image:
+            self.bot.send_photo(chat_id, photo=image, caption=message,
+                                reply_markup=markup, parse_mode="HTML")
+        else:
+            self.bot.send_message(chat_id, text=message, reply_markup=markup,
+                                  parse_mode="HTML")

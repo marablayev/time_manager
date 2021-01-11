@@ -1,6 +1,7 @@
 from django.db import models
 
 from employees.models import Employee
+from bot.bot import bot_init
 
 
 class Event(models.Model):
@@ -22,6 +23,20 @@ class Event(models.Model):
     notes = models.TextField(null=True, blank=True)
     place = models.CharField(max_length=255)
     force_notify = models.BooleanField(default=False)
+
+    def notify_employees(self):
+        queryset = Employee.objects.all()
+        if not self.all_employees:
+            queryset = self.employees_to_notify.all()
+
+        updater = bot_init(token)
+        updater.event_notify(self, queryset)
+        self.employees_notified = True
+        self.save()
+        EventConfirmation.objects.bulk_create(
+            [EventConfirmation(event=self, employee=employee) for employee in queryset],
+            batch_size=500
+        )
 
 
 class EventConfirmation(models.Model):

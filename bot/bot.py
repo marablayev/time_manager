@@ -40,7 +40,7 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
         dp = self.dispatcher
 
         conv_handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start)],
+            entry_points=[CommandHandler('start', self.start)],
             states={
                 self.MAIN_MENU: [
                     CommandHandler('start', self.start),
@@ -50,12 +50,9 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
                 ],
                 self.AUTH: [
                     CommandHandler('start', self.start),
-                    CallbackQueryHandler(self.company_selected, pattern='^company_(-?[0-9]+)$'),
-                    MessageHandler(Filters.text, self.full_name_entered)
                 ],
                 self.STARTING: [
                     CommandHandler('start', self.start),
-                    MessageHandler(Filters.regex('^([0-1][0-9]|2[0-3]):[0-5][0-9]$'), self.time_entered),
                     CallbackQueryHandler(self.now_selected, pattern='^now_selected$'),
                 ],
                 self.ABSENCE: [
