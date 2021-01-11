@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.conf.urls.static import static
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -24,12 +25,15 @@ admin.site.enable_nav_sidebar = False
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('events/', include('event_management.urls')),
-    path('activity/', include('time_management.urls')),
-    path('tasks/', include('task_management.urls')),
-    path('employees/', include('employees.urls')),
+    path('api/events/', include('event_management.urls')),
+    path('api/activity/', include('time_management.urls')),
+    path('api/tasks/', include('task_management.urls')),
+    path('api/employees/', include('employees.urls')),
     
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
