@@ -38,11 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_crontab',
+    'drf_spectacular',
 
     'time_management',
     'employees',
     'event_management',
     'task_management',
+    'rest_framework',
 
     'django_extensions'
 ]
@@ -140,3 +142,16 @@ CRONJOBS = [
 ]
 
 PHONENUMBER_DB_FORMAT='E164'
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated"
+    ],
+    "DATETIME_FORMAT": "%Y-%m-%dT%H:%M",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 25,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
