@@ -42,22 +42,11 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
             states={
-                self.MAIN_MENU: [
-                    CommandHandler('start', self.start),
-                    MessageHandler(Filters.regex('^(Начать рабочий день)|(Закончить рабочий день)$'), self.start_shift),
-                    MessageHandler(Filters.regex('^(Отсуствую)$'), self.absent_today),
-                    MessageHandler(Filters.regex('^(Моя статистика)$'), self.stats_page),
-                ],
-                self.AUTH: [
-                    CommandHandler('start', self.start),
-                ],
-                self.STARTING: [
-                    CommandHandler('start', self.start),
-                    CallbackQueryHandler(self.now_selected, pattern='^now_selected$'),
-                ],
-                self.ABSENCE: [
-                    MessageHandler(Filters.text, self.absence_excuse_entered)
-                ]
+                self.MAIN_MENU: self.get_time_management_handlers(),
+                self.AUTH: self.get_auth_handlers(),
+                self.STARTING: self.get_starting_shift_handlers(),
+                self.ABSENCE: self.get_absence_handlers(),
+                self.PROFILE: self.get_profile_handlers(),
             },
             fallbacks=[
                 CommandHandler('start', self.start)
@@ -68,7 +57,7 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
 
         dp.add_handler(conv_handler)
         dp.add_handler(MessageHandler(Filters.text, self.undefined_cmd_msg))
-        
+
     def set_commands(self):
         bot = self.bot
         commands_raw = [
@@ -82,6 +71,5 @@ def bot_init(token):
     Method to initialize bot updater
     """
     updater = BotUpdater(token)
-    
+
     return updater
-    

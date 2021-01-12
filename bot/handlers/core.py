@@ -1,3 +1,6 @@
+import phonenumbers
+
+from phonenumbers.phonenumberutil import NumberParseException
 from telegram import (
     ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup,
     InputMediaPhoto, ReplyKeyboardRemove, error as TelegramError, BotCommand)
@@ -5,32 +8,45 @@ from telegram.ext import (
     Updater, CommandHandler, Filters, MessageHandler, ConversationHandler,
     CallbackQueryHandler, PicklePersistence)
 
+from django.utils import timezone
+
+from employees.models import Employee, Company
+from time_management import ActivityStatus
+from time_management.models import EmployeeActivity
 from ..markups import get_markup
 
 
 class CoreHandler:
     # Bot main states
-    MAIN_MENU, AUTH, STARTING, ABSENCE = range(100, 104)
+    MAIN_MENU, AUTH, STARTING, ABSENCE, PROFILE = range(100, 105)
     # Bot end state
     END = ConversationHandler.END
 
     def get_auth_handlers(self):
-        pass
+        return [
+            CommandHandler('start', self.start),
+            MessageHandler(Filters.contact, self.authorize),
+            MessageHandler(Filters.text, self.authorize)
+        ]
 
     def start(self, update, context):
         chat = update.message.chat
-        if check_user(chat):
-            render_main_menu(update, context)
+        if self.check_user(chat):
+            self.render_main_menu(update, context)
             return self.MAIN_MENU
 
         user = update.message.from_user
         text = self.reply_manager.get_message("welcome_message_reply")
-        text = text.format(user.first_name or user.username)
+        text = text.format(name=user.first_name or user.username)
         update.message.reply_text(text=text, reply_markup=ReplyKeyboardRemove())
 
+        keyboard = [
+            [KeyboardButton(self.reply_manager.get_message('share_phone_button'), request_contact=True)]
+        ]
+        markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         update.message.reply_text(
             text=self.reply_manager.get_message("phone_prompt_reply"),
-            reply_markup=ReplyKeyboardRemove()
+            reply_markup=markup
         )
 
         return self.AUTH
@@ -49,18 +65,18 @@ class CoreHandler:
                             employee=employee, date=current_date)
         status = activity.status or ActivityStatus.FINISHED
         shift_change_keys = [
-            KeyboardButton(self.reply_manager.get_message('start_shift_button')),#'Начать рабочий день'),
-            KeyboardButton(self.reply_manager.get_message('absent_button'))#'Отсуствую')
+            KeyboardButton(self.reply_manager.get_message('start_shift_button')),
+            KeyboardButton(self.reply_manager.get_message('absent_button'))
         ]
         if status == ActivityStatus.WORKING:
             shift_change_keys = [
                 KeyboardButton(self.reply_manager.get_message('finish_shift_button'))
-            ]#'Закончить рабочий день')]
+            ]
 
         keyboard = [
             shift_change_keys,
             [
-                KeyboardButton(self.reply_manager.get_message('my_stats_button')),#'Выбрать действие'), < ==== # Создать задачу
+                KeyboardButton(self.reply_manager.get_message('make_action_button')),#'Выбрать действие'), < ==== # Создать задачу
                                                                                                              # Создать событие
                 KeyboardButton(self.reply_manager.get_message('profile_button'))#'Профиль(0)') <===# Статистика
                                                                                                 # Мои задачи(0)
@@ -90,18 +106,18 @@ class CoreHandler:
         else:
             phone = update.message.text
 
-        if phone_number[0] != '+':
-            phone_number = f"+{phone_number}"
+        if phone[0] != '+':
+            phone = f"+{phone}"
 
         try:
-            phonenumbers.parse(phone_number, None)
+            phonenumbers.parse(phone, None)
         except NumberParseException as e:
             msg = update.message.reply_text(
                 self.reply_manager.get_message('phone_prompt_reply'), parse_mode='HTML'
             )
             return
 
-        employee = Employee.objects.filter(phone=phone_number).first()
+        employee = Employee.objects.filter(phone=phone).first()
 
         if not employee:
             msg = update.message.reply_text(
@@ -109,7 +125,7 @@ class CoreHandler:
             )
             return
 
-        elif employee.chat_id:
+        elif employee.chat_id and int(employee.chat_id) != update.message.chat.id:
             msg = update.message.reply_text(
                 self.reply_manager.get_message('already_signed_in_reply'), parse_mode='HTML'
             )
@@ -117,9 +133,9 @@ class CoreHandler:
 
         employee.chat_id = update.message.chat.id
         employee.save()
-        EmployeeActivity.objects.create(employee=employee)
+        EmployeeActivity.objects.get_or_create(employee=employee)
 
-        render_main_menu(update, context, self.reply_manager.get_message("successful_login"))
+        self.render_main_menu(update, context, self.reply_manager.get_message("successful_login"))
         return self.MAIN_MENU
 
     def check_user(self, chat):

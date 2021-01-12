@@ -17,3 +17,15 @@ def get_markup(markup_name, *args, **kwargs):
 
 def test_method(test_arg=0):
     return 1 + test_arg
+
+
+def profile_page():
+    keyboard = [
+        [
+            KeyboardButton('Главное меню'), KeyboardButton('Моя статистика')],
+        [
+            KeyboardButton('Мои события'), KeyboardButton('Мои задачи')]
+    ]
+
+    markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    return markup

@@ -1,0 +1,95 @@
+[
+  {
+      "code": "welcome_message_reply",
+      "message": "Добро пожаловать! {name}"
+  },
+  {
+      "code": "start_shift_button",
+      "message": "Начать рабочий день"
+  },
+  {
+      "code": "absent_button",
+      "message": "Отсуствую"
+  },
+  {
+      "code": "finish_shift_button",
+      "message": "Закончить рабочий день"
+  },
+  {
+      "code": "my_stats_button",
+      "message": "Моя статистика"
+  },
+  {
+      "code": "profile_button",
+      "message": "Профиль"
+  },
+  {
+      "code": "user_not_found_reply",
+      "message": "Сотрудник с таким номером не существует. Пожалуйста, обратитесть к менеджеру"
+  },
+  {
+      "code": "already_signed_in_reply",
+      "message": "Вы уже были авторизованы в другом телеграм аккаунте."
+  },
+  {
+      "code": "undefined_cmd_msg",
+      "message": "Я вас не понимаю, попробуйте начать сначала. /start"
+  },
+  {
+      "code": "share_phone_button",
+      "message": "Поделиться номером телефона"
+  },
+  {
+      "code": "successful_login",
+      "message": "Вы успешно авторизоваиль"
+  },
+  {
+      "code": "phone_prompt_reply",
+      "message": "Пожалуйста, воспользуйтесь кнопкой ниже [Поделиться номером телефона] или введите свой номер в международном формате без пробелов (+77073332211)"
+  },
+
+  {
+      "code": "already_finished_reply",
+      "message": "Вы уже завершили сегодняшний день."
+  },
+  {
+      "code": "start_shift_confirm_prompt_reply",
+      "message": "Нажмите на кнопку 'Подтверждаю'"
+  },
+  {
+      "code": "start_shift_confirm_button",
+      "message": "Подтверждаю"
+  },
+  {
+      "code": "successful_started_reply",
+      "message": "Вы начали рабочий день. Удачи!:)"
+  },
+  {
+      "code": "successful_finished_reply",
+      "message": "Спасибо за службу. Иди домой и отдохни!"
+  },
+  {
+      "code": "absense_excuse_reply",
+      "message": "Пожалуйста, опишите причину вашего отсуствия:"
+  },
+  {
+      "code": "absense_excuse_entered_reply",
+      "message": "Понятно... Возвращайся скорее! Без тебя на работе томно:)"
+  },
+  {
+      "code": "stats_page_reply",
+      "message": "Ваша активность за текущий месяц:"
+  },
+  {
+      "code": "profile_button",
+      "message": "Профиль"
+  },
+  {
+      "code": "profile_page_reply",
+      "message": "Ваш профиль:"
+  },
+  {
+      "code": "make_action_button",
+      "message": "Выбрать действие"
+  }
+]

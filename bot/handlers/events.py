@@ -1,4 +1,6 @@
 
 
 class EventsHandler:
-    pass
+
+    def actions_page(self, update, context):
+        pass
