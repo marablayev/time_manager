@@ -118,30 +118,3 @@ class TimeManagementHandler:
         text = self.reply_manager.get_message('absense_excuse_entered_reply')
         self.render_main_menu(update, context, text)
         return self.MAIN_MENU
-
-
-    def stats_page(self, update, context):
-        chat = update.message.chat
-        text = self.reply_manager.get_message('stats_page_reply')
-
-        current_date = timezone.localdate()
-        employee = Employee.objects.filter(chat_id=chat.id).first()
-        activity, _ = EmployeeActivity.objects.get_or_create(
-                            employee=employee, date=current_date)
-
-        activities = EmployeeActivity.objects.filter(
-                        employee=employee, date__month=current_date.month
-                        ).order_by("date")
-        keyboard = []
-        for activity in activities:
-            act_date = activity.date.strftime('%Y-%m-%d')
-            start_time = activity.start_time.strftime('%H:%M') if activity.start_time else 'N/a'
-            finish_time = activity.finish_time.strftime('%H:%M') if activity.finish_time else 'N/a'
-            keyboard.append(
-                [
-                    InlineKeyboardButton(act_date, callback_data='empty'),
-                    InlineKeyboardButton(f"{start_time} - {finish_time}", callback_data='empty')
-                ]
-            )
-        markup = InlineKeyboardMarkup(keyboard)
-        update.message.reply_text(text, reply_markup=markup)

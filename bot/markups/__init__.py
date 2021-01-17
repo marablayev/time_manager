@@ -29,3 +29,19 @@ def profile_page():
 
     markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     return markup
+
+
+def profile_back():
+    keyboard = [
+        [InlineKeyboardButton(reply_manager.get_message("back_button"), callback_data="profile_back_button")],
+    ]
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+
+def stats_page():
+    keyboard = [
+        [InlineKeyboardButton(reply_manager.get_message("detailed_stats_button"), callback_data="detailed_stats")],
+    ]
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup

@@ -24,13 +24,13 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 admin.site.enable_nav_sidebar = False
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api/admin/', admin.site.urls),
     path('api/events/', include('event_management.urls')),
     path('api/activity/', include('time_management.urls')),
     path('api/tasks/', include('task_management.urls')),
     path('api/employees/', include('employees.urls')),
     path('api/telegram/', include('bot.urls')),
-    
+
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),

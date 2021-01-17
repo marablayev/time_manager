@@ -91,5 +91,13 @@
   {
       "code": "make_action_button",
       "message": "Выбрать действие"
+  },
+  {
+      "code": "back_button",
+      "message": "Назад"
+  },
+  {
+      "code": "detailed_stats_button",
+      "message": "По дням"
   }
 ]

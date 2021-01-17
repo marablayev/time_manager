@@ -18,7 +18,7 @@ from ..markups import get_markup
 
 class CoreHandler:
     # Bot main states
-    MAIN_MENU, AUTH, STARTING, ABSENCE, PROFILE = range(100, 105)
+    MAIN_MENU, AUTH, STARTING, ABSENCE, PROFILE, STATS_PAGE = range(100, 106)
     # Bot end state
     END = ConversationHandler.END
 
@@ -87,10 +87,10 @@ class CoreHandler:
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
         if text is None:
-            text = "Главное меню."
+            text = "Главное меню"
         if update and update.callback_query:
             bot = query.bot
-            bot.delete_message(chat.id, query.message.message_id)
+            # bot.delete_message(chat.id, query.message.message_id)
             bot.send_message(chat.id, text=text, reply_markup=reply_markup)
         elif update:
             update.message.reply_text(text=text, reply_markup=reply_markup)
