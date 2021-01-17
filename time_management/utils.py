@@ -1,9 +1,12 @@
 import calendar
+import xlsxwriter
 from datetime import datetime, timedelta
 
 from django.utils import timezone
+from django.http import HttpResponse
 
-from time_management.models import HolidayMoved, Holiday
+from time_management.models import HolidayMoved, Holiday, EmployeeActivity
+from employees.models import Employee
 
 
 def is_holiday(date=timezone.localdate()):
@@ -72,8 +75,71 @@ def get_stats(employees=[], date=None):
             "extra_hours": abs(diff_hours) if diff_hours < 0 else 0,
             "missing_hours": abs(diff_hours) if diff_hours > 0 else 0,
             "total_worked_hours": worked_hours,
+            "diff_hours": diff_hours * -1,
             "absent": 0
         }
         resp.append(resp_data)
 
     return resp
+
+
+def write_to_xlxs():
+    current_date = timezone.localdate()
+    employees = Employee.objects.all().order_by('company')
+
+    monthrange = calendar.monthrange(current_date.year, current_date.month)
+    days = []
+    for day in range(1, monthrange[1] + 1):
+        date = current_date.replace(day=day)
+        days.append(date.strftime('%m/%d/%Y'))
+
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="time_manager.xlsx"'
+    # Start writing to file
+    workbook = xlsxwriter.Workbook(response)
+    worksheet = workbook.add_worksheet()
+    bold = workbook.add_format({'bold': True})
+    header_date_format = workbook.add_format()
+    merge_format = workbook.add_format()
+    merge_format.set_align('center')
+    user_format = workbook.add_format()
+    row = 0
+    col = 2
+    for day in days:
+        worksheet.write(row, col, day, header_date_format)
+        col += 1
+
+    worksheet.write(row, col, 'Итого', header_date_format)
+
+    companies = []
+    row = 1
+    col = 2
+    for employee in employees:
+        activities = EmployeeActivity.objects.filter(
+                        employee=employee, date__month=current_date.month)
+        activities_dict = {
+            a.date.strftime('%m/%d/%Y'): a for a in activities
+        }
+        total_hours = timedelta(0)
+        if employee.company.id not in companies:
+            worksheet.merge_range(row, 0, row, 1, employee.company.name, merge_format)
+            companies.append(employee.company.id)
+            row += 1
+        worksheet.write(row, 0, employee.full_name, user_format)
+        for day in days:
+            activity = activities_dict.get(day)
+            if activity:
+                start, end = activity.start_time, activity.finish_time
+            else:
+                start, end = None, None
+            value = calculate_work_hours(start, end)
+            total_hours += timedelta(seconds=value.total_seconds())
+            worksheet.write(row, col, str(value))
+            col += 1
+        worksheet.write(row, col, str(total_hours))
+        col = 2
+        row += 1
+
+    workbook.close()
+    return response

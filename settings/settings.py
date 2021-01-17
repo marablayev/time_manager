@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_crontab',
     'drf_spectacular',
     'rest_framework',
+    'corsheaders',
 
     'time_management',
     'employees',
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -141,6 +143,16 @@ BOT_TOKEN = os.getenv('BOT_TOKEN', '1232155845:AAFEignycThAIIYzxZocHjUKC9NyhpgGO
 CRONJOBS = [
     ('*/50 * * * *', 'django.core.management.call_command', ['notify_users']),
 ]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:8000",
+    "http://localhost:4200"
+]
+CORS_ALLOW_ALL_ORIGINS = True
 
 PHONENUMBER_DB_FORMAT='E164'
 
