@@ -18,6 +18,17 @@ class EmployeeModelViewSet(viewsets.ModelViewSet):
     def export(self, request, *args, **kwargs):
         return write_to_xlxs()
 
+    @action(methods=["GET"], detail=False)
+    def get_employee(self, request, *args, **kwargs):
+        user = request.user
+        print(user)
+        employee = None
+        if hasattr(user, 'employee_profile'):
+            employee = user.employee_profile
+
+        serializer = EmployeeSerializer(employee, context={"request": request})
+        return Response(serializer.data)
+
 
 class EmployeePhotoUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
