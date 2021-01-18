@@ -45,3 +45,22 @@ def stats_page():
     ]
     markup = InlineKeyboardMarkup(keyboard)
     return markup
+
+
+def get_iterator_keyboard(current, maximum, model):
+    prev = current - 1 if current > 0 else maximum
+    next = current + 1 if current < maximum else 0
+    return [
+        [
+            InlineKeyboardButton('<', callback_data=f'{model}_item_get_{prev}'),
+            InlineKeyboardButton(f'{current + 1}/{maximum + 1}', callback_data=f'empty'),
+            InlineKeyboardButton('>', callback_data=f'{model}_item_get_{next}'),
+        ]
+    ]
+
+
+def get_event_markup(current, maximum, offer_id) -> InlineKeyboardMarkup:
+    keyboard = get_iterator_keyboard(current, maximum, 'events')
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup

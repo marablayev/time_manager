@@ -99,5 +99,9 @@
   {
       "code": "detailed_stats_button",
       "message": "По дням"
+  },
+  {
+      "code": "no_events_reply",
+      "message": "У вас нет событий"
   }
 ]
