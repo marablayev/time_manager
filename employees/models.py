@@ -36,6 +36,7 @@ class Employee(models.Model):
     class Meta:
         verbose_name = "Сотрудник"
         verbose_name_plural = "Сотрудники"
+        ordering = ("id", )
 
     company = models.ForeignKey(
         Company, related_name='employees', on_delete=models.PROTECT)
