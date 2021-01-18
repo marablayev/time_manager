@@ -15,6 +15,7 @@ class Event(models.Model):
         related_name="created_events",
         on_delete=models.CASCADE
     )
+    title = models.CharField(max_length=255, default='')
     all_employees = models.BooleanField(default=False)
     employees_to_notify = models.ManyToManyField(
         Employee, related_name="events_in_notification")
