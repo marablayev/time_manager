@@ -48,6 +48,9 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
                 self.ABSENCE: self.get_absence_handlers(),
                 self.PROFILE: self.get_profile_handlers(),
                 self.STATS_PAGE: self.get_stats_handers(),
+                self.EVENTS_PAGE: self.get_event_handlers(),
+                self.TASKS_PAGE: self.get_tasks_handlers(),
+                self.NEWS_PAGE: self.get_news_handlers(),
             },
             fallbacks=[
                 CommandHandler('start', self.start)

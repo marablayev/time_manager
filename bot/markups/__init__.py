@@ -22,9 +22,12 @@ def test_method(test_arg=0):
 def profile_page():
     keyboard = [
         [
-            KeyboardButton('Главное меню'), KeyboardButton('Моя статистика')],
+            KeyboardButton('Главное меню')],
         [
-            KeyboardButton('Мои события'), KeyboardButton('Мои задачи')]
+            KeyboardButton('Моя статистика'), KeyboardButton('Мои события')
+        ],
+        [
+            KeyboardButton('Новости'), KeyboardButton('Мои задачи')]
     ]
 
     markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -61,6 +64,20 @@ def get_iterator_keyboard(current, maximum, model):
 
 def get_event_markup(current, maximum, offer_id) -> InlineKeyboardMarkup:
     keyboard = get_iterator_keyboard(current, maximum, 'events')
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+
+def get_task_markup(current, maximum, offer_id) -> InlineKeyboardMarkup:
+    keyboard = get_iterator_keyboard(current, maximum, 'tasks')
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+
+def get_news_markup(current, maximum, offer_id) -> InlineKeyboardMarkup:
+    keyboard = get_iterator_keyboard(current, maximum, 'news')
 
     markup = InlineKeyboardMarkup(keyboard)
     return markup

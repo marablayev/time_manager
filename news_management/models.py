@@ -27,13 +27,14 @@ class News(models.Model):
     image = models.ImageField(null=True, blank=True, upload_to=news_photo_path)
 
     def save(self, *args, **kwargs):
+        init_id = self.id
         super(News, self).save(*args, **kwargs)
         if not self.employees_notified:
             employees = self.employees_to_notify.all()
             if self.all_employees:
                 employees = Employee.objects.all()
-
-            updater = bot_init(settings.BOT_TOKEN)
-            updater.news_notify(self, employees)
-            self.employees_notified = True
-            self.save()
+            if employees.exists():
+                updater = bot_init(settings.BOT_TOKEN)
+                updater.news_notify(self, employees)
+                self.employees_notified = True
+                self.save()

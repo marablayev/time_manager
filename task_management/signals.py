@@ -12,8 +12,6 @@ def task_post_save(sender, instance: Task, created, *args, **kwargs):
         employees = Employee.objects.all()
 
     employees = employees.exclude(task_confirmations__task=instance)
-    new_confirmations = [
-        TaskConfirmation(task=instance, employee=employee) for employee in employees]
 
     for employee in employees:
         confirmation = TaskConfirmation.objects.create(task=instance, employee=employee)

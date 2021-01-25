@@ -19,7 +19,7 @@ from ..markups import get_markup
 class CoreHandler:
     # Bot main states
     MAIN_MENU, AUTH, STARTING, ABSENCE, PROFILE, STATS_PAGE = range(100, 106)
-    EVENTS_PAGE, TASKS_PAGE = range(106, 108)
+    EVENTS_PAGE, TASKS_PAGE, NEWS_PAGE = range(106, 109)
     # Bot end state
     END = ConversationHandler.END
 
