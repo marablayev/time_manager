@@ -1,12 +1,15 @@
 import phonenumbers
+from uuid import uuid4
 
 from phonenumbers.phonenumberutil import NumberParseException
 from telegram import (
     ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup,
-    InputMediaPhoto, ReplyKeyboardRemove, error as TelegramError, BotCommand)
+    InputMediaPhoto, ReplyKeyboardRemove, error as TelegramError, BotCommand,
+    InlineQueryResultArticle, InputTextMessageContent, ParseMode)
 from telegram.ext import (
     Updater, CommandHandler, Filters, MessageHandler, ConversationHandler,
     CallbackQueryHandler, PicklePersistence)
+from telegram.utils.helpers import escape_markdown
 
 from django.utils import timezone
 
@@ -19,7 +22,8 @@ from ..markups import get_markup
 class CoreHandler:
     # Bot main states
     MAIN_MENU, AUTH, STARTING, ABSENCE, PROFILE, STATS_PAGE = range(100, 106)
-    EVENTS_PAGE, TASKS_PAGE, NEWS_PAGE = range(106, 109)
+    EVENTS_PAGE, TASKS_PAGE, NEWS_PAGE, ACTIONS_PAGE = range(106, 110)
+    EVENT_CREATE, TASK_CREATE, NEWS_CREATE = range(110, 113)
     # Bot end state
     END = ConversationHandler.END
 
@@ -143,6 +147,7 @@ class CoreHandler:
         return Employee.objects.filter(chat_id=chat.id).exists()
 
     def undefined_cmd_msg(self, update, context):
+        print(update)
         msg = update.message.reply_text(
                 self.reply_manager.get_message('undefined_cmd_msg'),
                 parse_mode='HTML',)
@@ -154,3 +159,26 @@ class CoreHandler:
         else:
             self.bot.send_message(chat_id, text=message, reply_markup=markup,
                                   parse_mode="HTML")
+
+    def inline_query(self, update, context):
+        """Handle the inline query."""
+        query = update.inline_query.query
+        results = [
+        InlineQueryResultArticle(
+        id=uuid4(), title="Caps", input_message_content=InputTextMessageContent(query.upper())
+        ),
+        InlineQueryResultArticle(
+        id=uuid4(),
+        title="Bold", input_message_content=InputTextMessageContent(
+                f"*{escape_markdown(query)}*", parse_mode=ParseMode.MARKDOWN
+            ),
+        ),
+        InlineQueryResultArticle(
+        id=uuid4(),
+        title="Italic", input_message_content=InputTextMessageContent(
+                f"_{escape_markdown(query)}_", parse_mode=ParseMode.MARKDOWN
+            ),
+        ),
+        ]
+
+        update.inline_query.answer(results)

@@ -9,7 +9,7 @@ from telegram import (
     InputMediaPhoto, ReplyKeyboardRemove, error as TelegramError, BotCommand)
 from telegram.ext import (
     Updater, CommandHandler, Filters, MessageHandler, ConversationHandler,
-    CallbackQueryHandler, PicklePersistence)
+    CallbackQueryHandler, PicklePersistence, InlineQueryHandler)
 
 
 from employees.models import Employee, Company
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, TasksHandler,
-                 TimeManagementHandler, NewsHandler, Updater):
+                 TimeManagementHandler, NewsHandler, ActionsHandler, Updater):
     def __init__(self, token, *args, **kwargs):
         persistence_file = os.path.join(settings.MEDIA_ROOT, 'bot_persistence_file')
         persistence = PicklePersistence(filename=persistence_file)
@@ -51,6 +51,10 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
                 self.EVENTS_PAGE: self.get_event_handlers(),
                 self.TASKS_PAGE: self.get_tasks_handlers(),
                 self.NEWS_PAGE: self.get_news_handlers(),
+                self.ACTIONS_PAGE: self.get_actions_handlers(),
+                self.EVENT_CREATE: self.get_event_creation_handlers(),
+                self.TASK_CREATE: self.get_task_creation_handlers(),
+                self.NEWS_CREATE: self.get_news_creation_handlers(),
             },
             fallbacks=[
                 CommandHandler('start', self.start)
@@ -63,6 +67,7 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
         dp.add_handler(CallbackQueryHandler(self.event_accepted, pattern='^event_will_come_(-?[0-9]+)$'),)
         dp.add_handler(CallbackQueryHandler(self.event_rejected, pattern='^event_will_not_come_(-?[0-9]+)$'),)
         dp.add_handler(CallbackQueryHandler(self.task_done, pattern='^task_done_(-?[0-9]+)$'),)
+        dp.add_handler(InlineQueryHandler(self.inline_query))
         dp.add_handler(MessageHandler(Filters.text, self.undefined_cmd_msg))
 
     def set_commands(self):

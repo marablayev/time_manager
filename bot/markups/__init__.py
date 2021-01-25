@@ -104,3 +104,62 @@ def task_notify_markup(task_id) -> InlineKeyboardMarkup:
 
     markup = InlineKeyboardMarkup(keyboard)
     return markup
+
+
+def actions_page_markup() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Событие/Встреча", callback_data=f'event_create_selected')],
+        [InlineKeyboardButton("Задача", callback_data=f'task_create_selected')],
+        [InlineKeyboardButton("Новость", callback_data=f'news_create_selected')],
+
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+def pass_by_image() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Пропустить этот шаг", callback_data=f'pass_by_image')],
+
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+def all_employees_markup() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Все пользователи", callback_data=f'all_employees_button')],
+
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+def pass_by_docs(text=None) -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton(text or "Пропустить этот шаг", callback_data=f'pass_by_docs')],
+
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+
+def actions_page_main_markup() -> ReplyKeyboardMarkup:
+    keyboard = [
+        [
+            KeyboardButton('Главное меню')],
+    ]
+
+    markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    return markup
+
+
+def actions_back() -> ReplyKeyboardMarkup:
+    keyboard = [
+        [
+            KeyboardButton('Главное меню'), KeyboardButton('Назад')],
+    ]
+
+    markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    return markup

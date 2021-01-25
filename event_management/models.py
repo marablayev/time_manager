@@ -29,6 +29,16 @@ class Event(models.Model):
     image = models.ImageField(null=True, blank=True, upload_to=events_photo_path)
 
 
+class EventDocs(models.Model):
+    class Meta:
+        ordering = ("-id", )
+        verbose_name = "Документ"
+        verbose_name_plural = "Документы"
+
+    event = models.ForeignKey(Event, related_name='docs', on_delete=models.CASCADE)
+    file = models.FileField(upload_to=events_photo_path)
+
+
 class EventConfirmation(models.Model):
     event = models.ForeignKey(
         Event,
