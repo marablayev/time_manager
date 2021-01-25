@@ -1,7 +1,11 @@
+from django.conf import settings
 from django.db import models
 
 from employees.models import Employee
 from bot.bot import bot_init
+
+def events_photo_path(instance, filename):
+    return f"events/{filename}"
 
 
 class Event(models.Model):
@@ -19,11 +23,10 @@ class Event(models.Model):
     all_employees = models.BooleanField(default=False)
     employees_to_notify = models.ManyToManyField(
         Employee, related_name="events_in_notification")
-    employees_notified = models.BooleanField(default=False)
     date_time = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     place = models.CharField(max_length=255)
-    force_notify = models.BooleanField(default=False)
+    image = models.ImageField(null=True, blank=True, upload_to=events_photo_path)
 
 
 class EventConfirmation(models.Model):
@@ -41,7 +44,7 @@ class EventConfirmation(models.Model):
     accepted = models.BooleanField(null=True, blank=True)
 
     def notify_employee(self):
-        updater = bot_init(token)
-        updater.event_notify(self, self.employee)
+        updater = bot_init(settings.BOT_TOKEN)
+        updater.event_notify(self.event, [self.employee])
         self.notified = True
         self.save()

@@ -39,6 +39,9 @@ class TimeManagementHandler:
             MessageHandler(Filters.text, self.absence_excuse_entered)
         ]
 
+    def actions_page(self):
+        pass
+
     def start_shift(self, update, context):
         chat = update.message.chat
 

@@ -103,5 +103,41 @@
   {
       "code": "no_events_reply",
       "message": "У вас нет событий"
+  },
+  {
+      "code": "events_received_reply",
+      "message": "Новое событие"
+  },
+  {
+      "code": "event_accepted_reply",
+      "message": "Вы подтвердили свое участиею"
+  },
+  {
+      "code": "event_rejected_reply",
+      "message": "Вы отказались от участия"
+  },
+  {
+      "code": "will_come_button",
+      "message": "Принять"
+  },
+  {
+      "code": "will_not_come_button",
+      "message": "Отказаться"
+  },
+  {
+      "code": "tasks_received_reply",
+      "message": "Новая задача"
+  },
+  {
+      "code": "task_done_reply",
+      "message": "Вы завершили задачу"
+  },
+  {
+      "code": "task_done_button",
+      "message": "Сделано"
+  },
+  {
+      "code": "news_received_reply",
+      "message": "Новость"
   }
 ]

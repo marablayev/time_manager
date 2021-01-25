@@ -64,3 +64,26 @@ def get_event_markup(current, maximum, offer_id) -> InlineKeyboardMarkup:
 
     markup = InlineKeyboardMarkup(keyboard)
     return markup
+
+
+def event_notify_markup(event_id) -> InlineKeyboardMarkup:
+    keyboard = [
+        [
+            InlineKeyboardButton(reply_manager.get_message('will_come_button'), callback_data=f'event_will_come_{event_id}'),
+            InlineKeyboardButton(reply_manager.get_message('will_not_come_button'), callback_data=f'event_will_not_come_{event_id}'),
+        ]
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+
+def task_notify_markup(task_id) -> InlineKeyboardMarkup:
+    keyboard = [
+        [
+            InlineKeyboardButton(reply_manager.get_message('task_done_button'), callback_data=f'task_done_{task_id}'),
+        ]
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup

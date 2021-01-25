@@ -16,8 +16,7 @@ def event_post_save(sender, instance: Event, created, *args, **kwargs):
     new_confirmations = [
         EventConfirmation(event=instance, employee=employee) for employee in employees]
 
+    print(employees)
     for employee in employees:
         confirmation = EventConfirmation.objects.create(event=instance, employee=employee)
         confirmation.notify_employee()
-
-    
