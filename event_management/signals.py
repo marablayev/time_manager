@@ -12,6 +12,12 @@ def event_post_save(sender, instance: Event, created, *args, **kwargs):
         employees = Employee.objects.all()
 
     employees = employees.exclude(event_confirmations__event=instance)
+
     new_confirmations = [
         EventConfirmation(event=instance, employee=employee) for employee in employees]
-    EventConfirmation.objects.bulk_create(new_confirmations, batch_size=500)
+
+    for employee in employees:
+        confirmation = EventConfirmation.objects.create(event=instance, employee=employee)
+        confirmation.notify_employee()
+
+    

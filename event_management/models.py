@@ -25,20 +25,6 @@ class Event(models.Model):
     place = models.CharField(max_length=255)
     force_notify = models.BooleanField(default=False)
 
-    def notify_employees(self):
-        queryset = Employee.objects.all()
-        if not self.all_employees:
-            queryset = self.employees_to_notify.all()
-
-        updater = bot_init(token)
-        updater.event_notify(self, queryset)
-        self.employees_notified = True
-        self.save()
-        EventConfirmation.objects.bulk_create(
-            [EventConfirmation(event=self, employee=employee) for employee in queryset],
-            batch_size=500
-        )
-
 
 class EventConfirmation(models.Model):
     event = models.ForeignKey(
@@ -51,4 +37,11 @@ class EventConfirmation(models.Model):
         related_name="event_confirmations",
         on_delete=models.CASCADE
     )
+    notified = models.BooleanField(default=False, null=True, blank=True)
     accepted = models.BooleanField(null=True, blank=True)
+
+    def notify_employee(self):
+        updater = bot_init(token)
+        updater.event_notify(self, self.employee)
+        self.notified = True
+        self.save()
