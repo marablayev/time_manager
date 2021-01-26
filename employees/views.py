@@ -21,7 +21,6 @@ class EmployeeModelViewSet(viewsets.ModelViewSet):
     @action(methods=["GET"], detail=False)
     def get_employee(self, request, *args, **kwargs):
         user = request.user
-        print(user)
         employee = None
         if hasattr(user, 'employee_profile'):
             employee = user.employee_profile

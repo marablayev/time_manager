@@ -81,12 +81,8 @@ class CoreHandler:
         keyboard = [
             shift_change_keys,
             [
-                KeyboardButton(self.reply_manager.get_message('make_action_button')),#'Выбрать действие'), < ==== # Создать задачу
-                                                                                                             # Создать событие
-                KeyboardButton(self.reply_manager.get_message('profile_button'))#'Профиль(0)') <===# Статистика
-                                                                                                # Мои задачи(0)
-                                                                                                # Мои События(0)
-                                                                                                # Изменить профиль < === Телефон, Имя фамилия, Компания
+                KeyboardButton(self.reply_manager.get_message('make_action_button')),
+                KeyboardButton(self.reply_manager.get_message('profile_button'))
             ],
         ]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -147,7 +143,6 @@ class CoreHandler:
         return Employee.objects.filter(chat_id=chat.id).exists()
 
     def undefined_cmd_msg(self, update, context):
-        print(update)
         msg = update.message.reply_text(
                 self.reply_manager.get_message('undefined_cmd_msg'),
                 parse_mode='HTML',)
@@ -163,22 +158,20 @@ class CoreHandler:
     def inline_query(self, update, context):
         """Handle the inline query."""
         query = update.inline_query.query
-        results = [
-        InlineQueryResultArticle(
-        id=uuid4(), title="Caps", input_message_content=InputTextMessageContent(query.upper())
-        ),
-        InlineQueryResultArticle(
-        id=uuid4(),
-        title="Bold", input_message_content=InputTextMessageContent(
-                f"*{escape_markdown(query)}*", parse_mode=ParseMode.MARKDOWN
-            ),
-        ),
-        InlineQueryResultArticle(
-        id=uuid4(),
-        title="Italic", input_message_content=InputTextMessageContent(
-                f"_{escape_markdown(query)}_", parse_mode=ParseMode.MARKDOWN
-            ),
-        ),
-        ]
+        employees = Employee.objects.filter(full_name__icontains=query)
+        results = []
+        for employee in employees:
+            result_article = InlineQueryResultArticle(
+                id=uuid4(),
+                title=f"{employee.full_name} - {employee.phone}",
+                input_message_content=InputTextMessageContent(
+                    f"inline_employee_selected_{employee.id}",
+                    parse_mode=ParseMode.HTML
+                )
+            )
+            results.append(result_article)
 
         update.inline_query.answer(results)
+
+    def inline_selected(self, update, context):
+        print(update.inline_query, "(((((((((((((((((((())))))))))))))))))))")

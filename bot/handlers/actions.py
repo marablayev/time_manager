@@ -30,8 +30,8 @@ class ActionsHandler:
             CallbackQueryHandler(self.pass_by_image_event, pattern='^pass_by_image$'),
             CallbackQueryHandler(self.pass_by_docs_event, pattern='^pass_by_docs$'),
             CallbackQueryHandler(self.all_employees_button, pattern='^all_employees_button$'),
-            MessageHandler(Filters.photo, self.handle_event_image_docs),
-            MessageHandler(Filters.document, self.handle_event_image_docs),
+            MessageHandler(Filters.photo, self.handle_image_docs),
+            MessageHandler(Filters.document, self.handle_image_docs),
             MessageHandler(Filters.text, self.handle_text),
         ]
 
@@ -102,6 +102,49 @@ class ActionsHandler:
         if type == 'news':
             return self.event_handle_text(update, context)
 
+    def pass_by_docs_event(self, update, context):
+        query = update.callback_query
+        query.answer()
+        text = 'Чтобы найти пользователей: \n\n'
+        text += ' - Наберите название данного бота(@dev_time_manager_bot) и нажмите на пробел\n'
+        text += ' - После начните набирать ФИО вашего коллеги\n'
+        text += ' - Выберите из списка'
+        reply_markup = get_markup('all_employees_markup')
+        query.edit_message_text(text, reply_markup=reply_markup)
+
+    def handle_image_docs(self, update, context):
+        image = update.message.photo
+        document = update.message.document
+
+        temp_action_creation = context.user_data['temp_action_creation']
+        if temp_action_creation.get('image') is None and not image:
+            update.message.reply_text('Закрепите картинку в правильном формате', reply_markup=get_markup('pass_by_image'))
+            return
+        elif temp_action_creation.get('image') is None:
+            temp_action_creation['image'] = image[-1].file_id
+            text = 'Закрепите Документы если они есть. Если нет, нажмите на кнопку Пропустить данный шаг.'
+            reply_markup = get_markup('pass_by_docs')
+            update.message.reply_text(text, reply_markup=reply_markup)
+            return
+
+        if document:
+            temp_action_creation.setdefault('docs', [])
+            temp_action_creation['docs'].append(document.file_id)
+            text = 'Закрепите еще Документы, либо нажмите на кнопку Продолжить.'
+            reply_markup = get_markup('pass_by_docs', 'Продолжить')
+            update.message.reply_text(text, reply_markup=reply_markup)
+            return
+
+    def all_employees_button(self, update, context):
+        query = update.callback_query
+        query.answer()
+
+        temp_action_creation = context.user_data['temp_action_creation']
+        temp_action_creation['all_employees'] = True
+
+        text = 'Ваше событие создано.'
+        return self.actions_page(update, context, text)
+
     def event_handle_text(self, update, context):
         temp_action_creation = context.user_data['temp_action_creation']
         text = 'Введите описание события'
@@ -135,47 +178,3 @@ class ActionsHandler:
         text = 'Закрепите Документы если они есть. Если нет, нажмите на кнопку Пропустить данный шаг.'
         reply_markup = get_markup('pass_by_docs')
         query.edit_message_text(text, reply_markup=reply_markup)
-
-    def pass_by_docs_event(self, update, context):
-        query = update.callback_query
-        query.answer()
-        text = 'Чтобы найти пользователей: \n\n'
-        text += ' - Наберите название данного бота(@dev_time_manager_bot) и нажмите на пробел\n'
-        text += ' - После начните набирать ФИО вашего коллеги\n'
-        text += ' - Выберите из списка'
-        reply_markup = get_markup('all_employees_markup')
-        query.edit_message_text(text, reply_markup=reply_markup)
-
-    def handle_event_image_docs(self, update, context):
-        image = update.message.photo
-        document = update.message.document
-
-        temp_action_creation = context.user_data['temp_action_creation']
-        if temp_action_creation.get('image') is None and not image:
-            update.message.reply_text('Закрепите картинку в правильном формате', reply_markup=get_markup('pass_by_image'))
-            return
-        elif temp_action_creation.get('image') is None:
-            temp_action_creation['image'] = image[-1].file_id
-            text = 'Закрепите Документы если они есть. Если нет, нажмите на кнопку Пропустить данный шаг.'
-            reply_markup = get_markup('pass_by_docs')
-            update.message.reply_text(text, reply_markup=reply_markup)
-            return
-
-        if document:
-            temp_action_creation.setdefault('docs', [])
-            temp_action_creation['docs'].append(document.file_id)
-            text = 'Закрепите еще Документы, либо нажмите на кнопку Продолжить.'
-            reply_markup = get_markup('pass_by_docs', 'Продолжить')
-            update.message.reply_text(text, reply_markup=reply_markup)
-            return
-
-    def all_employees_button(self, update, context):
-        query = update.callback_query
-        query.answer()
-
-        temp_action_creation = context.user_data['temp_action_creation']
-        temp_action_creation['all_employees'] = True
-        print(temp_action_creation)
-
-        text = 'Ваше событие создано.'
-        return self.actions_page(update, context, text)
