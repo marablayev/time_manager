@@ -126,9 +126,10 @@ def pass_by_image() -> InlineKeyboardMarkup:
     markup = InlineKeyboardMarkup(keyboard)
     return markup
 
-def all_employees_markup() -> InlineKeyboardMarkup:
+def all_employees_markup(type="all") -> InlineKeyboardMarkup:
+    text = "Все пользователи" if type == "all" else "Закончить"
     keyboard = [
-        [InlineKeyboardButton("Все пользователи", callback_data=f'all_employees_button')],
+        [InlineKeyboardButton(text, callback_data=f'{type}_employees_button')],
 
     ]
 
