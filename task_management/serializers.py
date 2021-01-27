@@ -8,6 +8,11 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = "__all__"
 
+    def create(self, validated_data):
+        instance = super(TaskSerializer, self).create(validated_data)
+        instance.save()
+        return instance
+
 
 class TaskConfirmationSerializer(serializers.ModelSerializer):
     class Meta:

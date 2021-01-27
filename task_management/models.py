@@ -10,6 +10,7 @@ def tasks_photo_path(instance, filename):
 
 class Task(models.Model):
     class Meta:
+        ordering = ("-id", )
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
 

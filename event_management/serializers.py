@@ -13,6 +13,11 @@ class EventSerializer(serializers.ModelSerializer):
                   'place', 'title', 'employees_to_notify',
                   'employee_name')
 
+    def create(self, validated_data):
+        instance = super(EventSerializer, self).create(validated_data)
+        instance.save()
+        return instance
+
 
 class EventConfirmationSerializer(serializers.ModelSerializer):
     class Meta:

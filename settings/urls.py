@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/events/', include('event_management.urls')),
     path('api/activity/', include('time_management.urls')),
     path('api/tasks/', include('task_management.urls')),
+    path('api/news/', include('news_management.urls')),
     path('api/employees/', include('employees.urls')),
     path('api/telegram/', include('bot.urls')),
 

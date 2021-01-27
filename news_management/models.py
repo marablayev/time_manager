@@ -10,8 +10,10 @@ def news_photo_path(instance, filename):
 
 class News(models.Model):
     class Meta:
+        ordering = ("-id", )
         verbose_name = 'Новость'
         verbose_name_plural = 'Новости'
+
     employee = models.ForeignKey(
         Employee,
         related_name="created_news",
@@ -25,6 +27,7 @@ class News(models.Model):
     title = models.CharField(max_length=255)
     text = models.TextField()
     image = models.ImageField(null=True, blank=True, upload_to=news_photo_path)
+    date_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         init_id = self.id
