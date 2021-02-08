@@ -58,3 +58,11 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.full_name}"
+
+    def save(self, *args, **kwargs):
+        print(getattr(self, 'user'))
+        super(Employee, self).save(*args, **kwargs)
+        if not getattr(self, 'user'):
+            user, _ = User.objects.get_or_create(username=f'employee_{self.id}')
+            self.user = user
+            self.save()

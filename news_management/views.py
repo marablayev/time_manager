@@ -13,15 +13,7 @@ from .serializers import NewsSerializer
 class NewsModelViewSet(viewsets.ModelViewSet):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
-
-    def create(self, request, *args, **kwargs):
-        user = request.user
-        data = request.data
-        data['employee'] = user.employee_profile.id
-        serializer = self.get_serializer_class()(data=data)
-        serializer.is_valid(raise_exception=True)
-        news = serializer.save()
-        return Response(self.get_serializer_class()(news).data)
+    parser_classes = (MultiPartParser, FormParser)
 
     @action(methods=['GET'], detail=False)
     def for_user(self, request, *args, **kwargs):

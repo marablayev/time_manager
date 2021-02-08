@@ -1,7 +1,7 @@
 import inspect, sys
 
 from telegram import (
-    ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup)
+    ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, LoginUrl)
 
 from bot.models import TelegramReplyTemplate
 
@@ -108,9 +108,9 @@ def task_notify_markup(task_id) -> InlineKeyboardMarkup:
 
 def actions_page_markup() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("Событие/Встреча", callback_data=f'event_create_selected')],
-        [InlineKeyboardButton("Задача", callback_data=f'task_create_selected')],
-        [InlineKeyboardButton("Новость", callback_data=f'news_create_selected')],
+        [InlineKeyboardButton("Событие/Встреча", login_url=LoginUrl(url='https://172.105.80.130/events-telegram/'))],#callback_data=f'event_create_selected')],
+        # [InlineKeyboardButton("Задача", login_url=LoginUrl(url='https://172.105.80.130/tasks-telegram/'))],#callback_data=f'task_create_selected')],
+        # [InlineKeyboardButton("Новость", login_url=LoginUrl(url='https://172.105.80.130/news-telegram/'))]#callback_data=f'news_create_selected')],
 
     ]
 
