@@ -134,7 +134,10 @@ class CoreHandler:
 
         employee.chat_id = update.message.chat.id
         employee.save()
-        EmployeeActivity.objects.get_or_create(employee=employee)
+        try:
+            EmployeeActivity.objects.get_or_create(employee=employee)
+        except:
+            pass
 
         self.render_main_menu(update, context, self.reply_manager.get_message("successful_login"))
         return self.MAIN_MENU

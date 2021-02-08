@@ -66,7 +66,7 @@ def get_stats(employees=[], date=None):
     for employee in employees:
         if not employee: continue
         worked_hours = get_worked_hours(employee, date=date, day_till=date.day)
-        diff_hours = total_hours_till_today - worked_hours
+        diff_hours = round(total_hours_till_today - worked_hours, 2)
 
         resp_data = {
             "employee_id": employee.id,

@@ -135,8 +135,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.getenv("STATIC_ROOT", os.path.join(BASE_DIR, "static/"))
 
-MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
+MEDIA_URL = os.getenv("MEDIA_URL", "/api/media/")
 MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(BASE_DIR, "media/"))
 
 BOT_TOKEN = os.getenv('BOT_TOKEN', '1232155845:AAFEignycThAIIYzxZocHjUKC9NyhpgGO2w')
