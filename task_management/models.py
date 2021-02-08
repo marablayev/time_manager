@@ -21,7 +21,7 @@ class Task(models.Model):
     )
     all_employees = models.BooleanField(default=False)
     employees_to_notify = models.ManyToManyField(
-        Employee, related_name="tasks_in_notification")
+        Employee, related_name="tasks_in_notification", blank=True)
     name = models.CharField(max_length=255)
     text = models.TextField()
     due_time = models.DateTimeField(null=True, blank=True)

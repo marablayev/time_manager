@@ -22,11 +22,12 @@ class Event(models.Model):
     title = models.CharField(max_length=255, default='')
     all_employees = models.BooleanField(default=False)
     employees_to_notify = models.ManyToManyField(
-        Employee, related_name="events_in_notification")
+        Employee, related_name="events_in_notification", blank=True)
     date_time = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     place = models.CharField(max_length=255)
     image = models.ImageField(null=True, blank=True, upload_to=events_photo_path)
+    telegram_group_link = models.URLField(null=True, blank=True)
 
 
 class EventDocs(models.Model):

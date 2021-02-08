@@ -9,7 +9,7 @@ from telegram import (
     InputMediaPhoto, ReplyKeyboardRemove, error as TelegramError, BotCommand)
 from telegram.ext import (
     Updater, CommandHandler, Filters, MessageHandler, ConversationHandler,
-    CallbackQueryHandler, PicklePersistence, InlineQueryHandler, ChosenInlineResultHandler)
+    CallbackQueryHandler, PicklePersistence)
 
 
 from employees.models import Employee, Company
@@ -67,8 +67,6 @@ class BotUpdater(CoreHandler, EventsHandler, ProfileHandler, StatsHandler, Tasks
         dp.add_handler(CallbackQueryHandler(self.event_accepted, pattern='^event_will_come_(-?[0-9]+)$'),)
         dp.add_handler(CallbackQueryHandler(self.event_rejected, pattern='^event_will_not_come_(-?[0-9]+)$'),)
         dp.add_handler(CallbackQueryHandler(self.task_done, pattern='^task_done_(-?[0-9]+)$'),)
-        dp.add_handler(InlineQueryHandler(self.inline_query))
-        dp.add_handler(ChosenInlineResultHandler(self.inline_selected))
         dp.add_handler(MessageHandler(Filters.text, self.undefined_cmd_msg))
 
     def set_commands(self):

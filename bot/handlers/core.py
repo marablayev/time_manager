@@ -172,6 +172,3 @@ class CoreHandler:
             results.append(result_article)
 
         update.inline_query.answer(results)
-
-    def inline_selected(self, update, context):
-        print(update.inline_query, "(((((((((((((((((((())))))))))))))))))))")

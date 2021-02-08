@@ -22,7 +22,7 @@ class News(models.Model):
     )
     all_employees = models.BooleanField(default=False)
     employees_to_notify = models.ManyToManyField(
-        Employee, related_name="news_in_notification")
+        Employee, related_name="news_in_notification", blank=True)
     employees_notified = models.BooleanField(default=False)
     title = models.CharField(max_length=255)
     text = models.TextField()

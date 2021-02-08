@@ -9,7 +9,9 @@ from django.utils import timezone
 
 from employees.models import Employee, Company
 from time_management import ActivityStatus
-from time_management.models import EmployeeActivity
+from time_management.models import EmployeeActivity, AbsenseExcuse
+
+from ..markups import get_markup
 
 
 class TimeManagementHandler:
@@ -36,7 +38,7 @@ class TimeManagementHandler:
 
     def get_absence_handlers(self):
         return [
-            MessageHandler(Filters.text, self.absence_excuse_entered)
+            CallbackQueryHandler(self.absence_excuse_entered, pattern='^absence_excuse_(-?[0-9]+)$')
         ]
 
     def start_shift(self, update, context):
@@ -98,13 +100,17 @@ class TimeManagementHandler:
             self.render_main_menu(update, context, text)
             return self.MAIN_MENU
 
-        update.message.reply_text(self.reply_manager.get_message('absense_excuse_reply'))
-        return ABSENCE
+        excuses = AbsenseExcuse.objects.all()
+        markup = get_markup('absence_markup', excuses)
+        update.message.reply_text(self.reply_manager.get_message('absense_excuse_reply'), reply_markup=markup)
+        return self.ABSENCE
 
 
     def absence_excuse_entered(self, update, context):
-        chat = update.message.chat
-        excuse = update.message.text
+        query = update.callback_query
+        query.answer()
+        chat = query.message.chat
+        *args, excuse_id = query.data.split('_')
 
         current_date = timezone.localdate()
         employee = Employee.objects.filter(chat_id=chat.id).first()
@@ -113,7 +119,7 @@ class TimeManagementHandler:
 
         activity.absent = True
         activity.status = ActivityStatus.FINISHED
-        activity.absence_excuse = excuse
+        activity.absence_excuse_id = excuse_id
         activity.save()
         text = self.reply_manager.get_message('absense_excuse_entered_reply')
         self.render_main_menu(update, context, text)

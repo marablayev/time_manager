@@ -4,7 +4,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.postgres.fields import DateRangeField
 from django.contrib.postgres.forms.ranges import RangeWidget
 
-from time_management.models import EmployeeActivity, Holiday, HolidayMoved
+from time_management.models import EmployeeActivity, Holiday, HolidayMoved, AbsenseExcuse
 from time_management.utils import write_to_xlxs
 
 
@@ -46,5 +46,6 @@ class HolidayAdmin(admin.ModelAdmin):
     }
 
 
+admin.site.register(AbsenseExcuse)
 admin.site.register(Holiday, HolidayAdmin)
 admin.site.register(EmployeeActivity, EmployeeActivityAdmin)

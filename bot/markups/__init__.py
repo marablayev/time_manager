@@ -164,3 +164,15 @@ def actions_back() -> ReplyKeyboardMarkup:
 
     markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     return markup
+
+
+def absence_markup(excuses):
+
+    keyboard = [
+        [
+            InlineKeyboardButton(excuse.name, callback_data=f'absence_excuse_{excuse.id}')
+        ] for excuse in excuses
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup

@@ -6,6 +6,18 @@ from employees.models import Employee
 from . import ActivityStatus
 
 
+class AbsenseExcuse(models.Model):
+    class Meta:
+        ordering = ('-id', )
+        verbose_name = "Причина отсуствия"
+        verbose_name_plural = "Причины отсуствия"
+
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class EmployeeActivity(models.Model):
     class Meta:
         verbose_name = "Активность сотрудника"
@@ -19,7 +31,8 @@ class EmployeeActivity(models.Model):
     finish_time = models.TimeField(null=True, blank=True)
     date = models.DateField(default=timezone.localdate, editable=False)
     absent = models.BooleanField(default=False)
-    absence_excuse = models.TextField(null=True, blank=True)
+    absence_excuse = models.ForeignKey(
+        AbsenseExcuse, on_delete=models.SET_NULL, null=True, blank=True, related_name='activities')
     pauses = ArrayField(DateRangeField(null=True, blank=True), default=list, blank=True)
     status = models.CharField(
         max_length=20, default=ActivityStatus.NEW, choices=ActivityStatus.choices)
