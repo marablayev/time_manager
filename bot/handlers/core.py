@@ -101,6 +101,11 @@ class CoreHandler:
 
         return self.MAIN_MENU
 
+    def send_otp(self, otp, chat_id):
+        message = f"Ваш одноразовый пароль для входа в систему: {otp}"
+
+        self.bot.send_message(chat_id, message)
+
     def authorize(self, update, context):
         if update.message.contact:
             phone = update.message.contact.phone_number

@@ -9,23 +9,26 @@ from time_management.models import HolidayMoved, Holiday, EmployeeActivity
 from employees.models import Employee
 
 
-def is_holiday(date=timezone.localdate()):
+def is_holiday(date=timezone.localdate(), employee=None):
 
     is_holiday = Holiday.objects.filter(dates__contains=date).exists()
     is_moved = HolidayMoved.objects.filter(moved_from=date).exists()
 
     is_holiday = is_holiday or not 0 <= date.weekday() < 5
+    if employee:
+        is_holiday = employee.vacations.filter(
+            start_date__gte=date, finish_date__lte=date)
 
     return is_holiday and not is_moved
 
 
-def calculate_total_hours(date=None, day_till=None, day_from=None):
+def calculate_total_hours(date=None, day_till=None, day_from=None, employee=None):
     date = timezone.localdate() if date is None else date
     monthrange = calendar.monthrange(date.year, date.month)
     day_till = monthrange[1] if day_till is None else day_till
     day_from = 1 if day_from is None else day_from
 
-    return sum(8 for d in range(day_from, day_till + 1) if not is_holiday(date.replace(day=d)))
+    return sum(8 for d in range(day_from, day_till + 1) if not is_holiday(date.replace(day=d), employee=employee))
 
 
 def calculate_work_hours(start, end):
@@ -59,12 +62,12 @@ def get_worked_hours(employee, date=None, day_till=None, day_from=None):
 
 def get_stats(employees=[], date=None):
     date = timezone.localdate() if date is None else date
-    total_hours_till_today = calculate_total_hours(date, day_till=date.day)
-    total_hours_for_month = calculate_total_hours(date)
     resp = []
 
     for employee in employees:
         if not employee: continue
+        total_hours_till_today = calculate_total_hours(date, day_till=date.day, employee=employee)
+        total_hours_for_month = calculate_total_hours(date, employee=employee)
         worked_hours = get_worked_hours(employee, date=date, day_till=date.day)
         diff_hours = round(total_hours_till_today - worked_hours, 2)
 

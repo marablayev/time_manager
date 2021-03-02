@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import os
+import os, base64
 from pathlib import Path
 from datetime import timedelta
 
@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_results',
+    'django_celery_beat',
     'django_crontab',
     'drf_spectacular',
     'rest_framework',
@@ -175,3 +177,28 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
 }
+
+# Celery settings
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
+
+CELERY_BROKER_URL = "redis://{host}:{port}".format(
+    host=REDIS_HOST,
+    port=REDIS_PORT
+)
+
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_RESULT_EXTENDED = True
+CELERY_ALWAYS_EAGER = False
+CELERY_ACKS_LATE = True
+CELERY_TASK_PUBLISH_RETRY = True
+CELERY_DISABLE_RATE_LIMITS = False
+CELERY_TASK_TRACK_STARTED = True
+
+AUTH_USER_MODEL = "employees.Employee"
+
+# OTP settings
+OTP_LENGTH = 4
+OTP_REPEAT_TIMEOUT = os.getenv('OTP_REPEAT_TIMEOUT', 1)
+OTP_VALIDITY_PERIOD = os.getenv('OTP_VALIDITY_PERIOD', 600)
+HOTP_KEY = base64.b32encode(SECRET_KEY.encode("utf-8"))

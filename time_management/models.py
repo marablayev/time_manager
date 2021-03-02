@@ -18,6 +18,16 @@ class AbsenseExcuse(models.Model):
         return self.name
 
 
+class Vacation(models.Model):
+    class Meta:
+        ordering = ('-id', )
+
+    employee = models.ForeignKey(
+        Employee, related_name='vacations', on_delete=models.CASCADE)
+    start_date = models.DateField()
+    finish_date = models.DateField()
+
+
 class EmployeeActivity(models.Model):
     class Meta:
         verbose_name = "Активность сотрудника"

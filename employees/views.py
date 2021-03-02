@@ -3,11 +3,16 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, GenericAPIView
+from rest_framework.permissions import AllowAny
+
+from rest_framework_simplejwt.views import TokenObtainPairView as BaseTokenObtainPairView
 
 from time_management.utils import write_to_xlxs
 from .models import Employee, Company
-from .serializers import EmployeeSerializer, CompanySerializer, EmployeePhotoUploadSerializer
+from .serializers import (
+    EmployeeSerializer, CompanySerializer, EmployeePhotoUploadSerializer,
+    TokenObtainPairSerializer, PhoneValidateSerializer)
 
 
 class EmployeeModelViewSet(viewsets.ModelViewSet):
@@ -20,12 +25,8 @@ class EmployeeModelViewSet(viewsets.ModelViewSet):
 
     @action(methods=["GET"], detail=False)
     def get_employee(self, request, *args, **kwargs):
-        user = request.user
-        employee = None
-        if hasattr(user, 'employee_profile'):
-            employee = user.employee_profile
 
-        serializer = EmployeeSerializer(employee, context={"request": request})
+        serializer = EmployeeSerializer(request.user, context={"request": request})
         return Response(serializer.data)
 
 
@@ -49,3 +50,19 @@ class EmployeePhotoUploadView(APIView):
 class CompanyModelViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
+
+
+class TokenObtainPairView(BaseTokenObtainPairView):
+    serializer_class = TokenObtainPairSerializer
+
+
+class SendOTPView(GenericAPIView):
+    serializer_class = PhoneValidateSerializer
+    queryset = Employee.objects.all()
+    permission_classes = (AllowAny, )
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response()

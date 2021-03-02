@@ -45,7 +45,7 @@ class EventSerializer(serializers.ModelSerializer):
         doc = validated_data.pop('new_docs', None)
         user = self.context['request'].user
         validated_data.pop('removed_image', False)
-        validated_data['employee'] = user.employee_profile
+        validated_data['employee'] = user
         instance = super(EventSerializer, self).create(validated_data)
         instance.save()
         if doc:

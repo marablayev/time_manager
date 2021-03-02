@@ -18,11 +18,14 @@ class EventModelViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     parser_classes = (MultiPartParser, FormParser)
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        queryset = queryset.filter(employee=self.request.user)
+        return queryset
+
     @action(methods=['GET'], detail=False)
     def for_user(self, request, *args, **kwargs):
-        user = request.user
-        employee = user.employee_profile
-        events = Event.objects.filter(confirmations__employee=employee)
+        events = Event.objects.filter(confirmations__employee=request.user)
         return Response(self.get_serializer_class()(events, many=True).data)
 
 

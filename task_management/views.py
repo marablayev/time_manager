@@ -15,7 +15,7 @@ class TaskModelViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         user = request.user
         data = request.data
-        data['employee'] = user.employee_profile.id
+        data['employee'] = user.id
         serializer = self.get_serializer_class()(data=data)
         serializer.is_valid(raise_exception=True)
         task = serializer.save()
@@ -23,9 +23,7 @@ class TaskModelViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], detail=False)
     def for_user(self, request, *args, **kwargs):
-        user = request.user
-        employee = user.employee_profile
-        tasks = Task.objects.filter(confirmations__employee=employee)
+        tasks = Task.objects.filter(confirmations__employee=request.user)
         return Response(self.get_serializer_class()(tasks, many=True).data)
 
 

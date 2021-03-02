@@ -1,11 +1,33 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from employees.models import Employee
 from bot.bot import bot_init
 
 def tasks_photo_path(instance, filename):
     return f"tasks/{filename}"
+
+
+class AutoTask(models.Model):
+    class Meta:
+        ordering = ("-id", )
+
+    employee = models.ForeignKey(
+        Employee,
+        related_name="created_auto_tasks",
+        on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=255)
+    text = models.TextField()
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True, upload_to=tasks_photo_path)
+    deletable = models.BooleanField(default=True, blank=True)
+    is_active = models.BooleanField(default=True, blank=True)
+    all_employees = models.BooleanField(default=False)
+    employees_to_notify = models.ManyToManyField(
+        Employee, related_name="auto_tasks", blank=True)
 
 
 class Task(models.Model):

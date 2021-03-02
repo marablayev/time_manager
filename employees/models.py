@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 from phonenumber_field.modelfields import PhoneNumberField
 from . import EmployeeRoles
@@ -32,7 +33,7 @@ class Company(models.Model):
         return self.name
 
 
-class Employee(models.Model):
+class Employee(AbstractUser):
     class Meta:
         verbose_name = "Сотрудник"
         verbose_name_plural = "Сотрудники"
@@ -50,19 +51,9 @@ class Employee(models.Model):
     birthday = models.DateField(null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
     occupation = models.CharField(max_length=255, null=True, blank=True)
-    user = models.OneToOneField(
-        User,
-        related_name='employee_profile',
-        on_delete=models.SET_NULL,
-        null=True, blank=True)
+
+    USERNAME_FIELD = 'phone'
+    username = None
 
     def __str__(self):
         return f"{self.full_name}"
-
-    def save(self, *args, **kwargs):
-        print(getattr(self, 'user'))
-        super(Employee, self).save(*args, **kwargs)
-        if not getattr(self, 'user'):
-            user, _ = User.objects.get_or_create(username=f'employee_{self.id}')
-            self.user = user
-            self.save()

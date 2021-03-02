@@ -18,7 +18,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        validated_data['employee'] = user.employee_profile
+        validated_data['employee'] = user
 
         instance = super(NewsSerializer, self).create(validated_data)
         instance.save()

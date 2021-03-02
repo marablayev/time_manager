@@ -15,9 +15,13 @@ class NewsModelViewSet(viewsets.ModelViewSet):
     serializer_class = NewsSerializer
     parser_classes = (MultiPartParser, FormParser)
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        queryset = queryset.filter(employee=self.request.user)
+        return queryset
+
     @action(methods=['GET'], detail=False)
     def for_user(self, request, *args, **kwargs):
         user = request.user
-        employee = user.employee_profile
-        news = News.objects.filter(Q(employees_to_notify=employee) | Q(all_employees=True)).distinct()
+        news = News.objects.filter(Q(employees_to_notify=user) | Q(all_employees=True)).distinct()
         return Response(self.get_serializer_class()(news, many=True).data)
