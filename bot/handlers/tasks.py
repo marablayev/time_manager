@@ -16,6 +16,8 @@ class TasksHandler:
     def get_tasks_handlers(self):
         return self.get_profile_handlers() + [
             CallbackQueryHandler(self.task_get, pattern='^tasks_item_get_(-?[0-9]+)$'),
+            CallbackQueryHandler(self.my_tasks, pattern='^my_tasks$'),
+            CallbackQueryHandler(self.invited_tasks, pattern='^invited_tasks$'),
         ]
 
     def task_notify(self, task, employees):
@@ -59,7 +61,33 @@ class TasksHandler:
 
         query.edit_message_text(self.reply_manager.get_message('task_done_reply'))
 
+    def tasks_page(self, update, context):
+        text = "Выберите фильтр:"
+
+        markup = get_markup("my_tasks_markup")
+        update.message.reply_text(text, reply_markup=markup)
+        return self.TASKS_PAGE
+
     def my_tasks(self, update, context):
+        from task_management.models import Task
+        if update.callback_query:
+            query = update.callback_query
+            query.answer()
+            chat = query.message.chat
+        else:
+            chat = update.message.chat
+
+        employee = Employee.objects.filter(chat_id=chat.id).first()
+        tasks = Task.objects.filter(employee=employee)
+        if not tasks.exists():
+            msg = query.edit_message_text(
+                self.reply_manager.get_message('no_tasks_reply'), parse_mode='HTML',)
+            return
+
+        self.render_task(chat.id, context, tasks)
+        return self.TASKS_PAGE
+
+    def invited_tasks(self, update, context):
         from task_management.models import Task
         if update.callback_query:
             query = update.callback_query
@@ -71,7 +99,7 @@ class TasksHandler:
         employee = Employee.objects.filter(chat_id=chat.id).first()
         tasks = Task.objects.filter(confirmations__employee=employee)
         if not tasks.exists():
-            msg = update.message.reply_text(
+            msg = query.edit_message_text(
                 self.reply_manager.get_message('no_tasks_reply'), parse_mode='HTML',)
             return
 

@@ -7,4 +7,5 @@ class ActivityStatus(models.TextChoices):
     NEW = 'new', 'Новый'
     ABSENT = 'absent', 'Отсуствует'
     WORKING = 'working', 'В работе'
+    PAUSED = 'paused', 'В перерыве'
     FINISHED = 'finished', 'Завершен'

@@ -75,6 +75,12 @@ class CoreHandler:
         ]
         if status == ActivityStatus.WORKING:
             shift_change_keys = [
+                KeyboardButton(self.reply_manager.get_message('pause_shift_button')),
+                KeyboardButton(self.reply_manager.get_message('finish_shift_button'))
+            ]
+        elif status == ActivityStatus.PAUSED:
+            shift_change_keys = [
+                KeyboardButton(self.reply_manager.get_message('continue_shift_button')),
                 KeyboardButton(self.reply_manager.get_message('finish_shift_button'))
             ]
 

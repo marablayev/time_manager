@@ -20,6 +20,8 @@ class EventsHandler:
     def get_event_handlers(self):
         return self.get_profile_handlers() + [
             CallbackQueryHandler(self.event_get, pattern='^events_item_get_(-?[0-9]+)$'),
+            CallbackQueryHandler(self.my_events, pattern='^my_events$'),
+            CallbackQueryHandler(self.invited_events, pattern='^invited_events$'),
         ]
 
     def event_notify(self, event, employees):
@@ -77,6 +79,14 @@ class EventsHandler:
         self.bot.send_message(query.message.chat_id, text=self.reply_manager.get_message('event_rejected_reply'))
 
 
+    def events_page(self, update, context):
+        text = "Выберите фильтр:"
+
+        markup = get_markup("my_events_markup")
+        update.message.reply_text(text, reply_markup=markup)
+        return self.EVENTS_PAGE
+
+
     def my_events(self, update, context):
         from event_management.models import Event
         if update.callback_query:
@@ -88,14 +98,35 @@ class EventsHandler:
 
         employee = Employee.objects.filter(chat_id=chat.id).first()
         current = timezone.now()
-        events = Event.objects.filter(confirmations__employee=employee, date_time__gte=current)
+        events = Event.objects.filter(employee=employee, date_time__gte=current)
         if not events.exists():
-            msg = update.message.reply_text(
+            msg = query.edit_message_text(
                 self.reply_manager.get_message('no_events_reply'), parse_mode='HTML',)
             return
 
         self.render_event(chat.id, context, events)
-        return self.EVENTS_PAGE
+
+
+    def invited_events(self, update, context):
+        from event_management.models import Event
+        if update.callback_query:
+            query = update.callback_query
+            query.answer()
+            chat = query.message.chat
+        else:
+            chat = update.message.chat
+
+        employee = Employee.objects.filter(chat_id=chat.id).first()
+        current = timezone.now()
+        events = Event.objects.filter(
+            confirmations__employee=employee,
+            confirmations__accepted=True, date_time__gte=current).distinct()
+        if not events.exists():
+            msg = query.edit_message_text(
+                self.reply_manager.get_message('no_events_reply'), parse_mode='HTML',)
+            return
+
+        self.render_event(chat.id, context, events)
 
     def render_event(self, chat_id, context, events, index=0):
         event = events[index]
