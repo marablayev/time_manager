@@ -12,7 +12,7 @@ from time_management.utils import write_to_xlxs
 from .models import Employee, Company
 from .serializers import (
     EmployeeSerializer, CompanySerializer, EmployeePhotoUploadSerializer,
-    TokenObtainPairSerializer, PhoneValidateSerializer)
+    TokenObtainPairSerializer, PhoneValidateSerializer, VacationSerializer)
 
 
 class EmployeeModelViewSet(viewsets.ModelViewSet):
@@ -22,6 +22,15 @@ class EmployeeModelViewSet(viewsets.ModelViewSet):
     @action(methods=["GET"], detail=False)
     def export(self, request, *args, **kwargs):
         return write_to_xlxs()
+
+    @action(methods=["POST"], detail=True)
+    def vacation(self, request, pk, *args, **kwargs):
+        data = request.data
+        data['employee'] = request.user.id
+        serializer = VacationSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     @action(methods=["GET"], detail=False)
     def get_employee(self, request, *args, **kwargs):

@@ -17,7 +17,7 @@ def is_holiday(date=timezone.localdate(), employee=None):
     is_holiday = is_holiday or not 0 <= date.weekday() < 5
     if employee:
         is_holiday = employee.vacations.filter(
-            start_date__gte=date, finish_date__lte=date)
+            start_date__lte=date, finish_date__gte=date).exists() or is_holiday
 
     return is_holiday and not is_moved
 
@@ -104,6 +104,17 @@ def write_to_xlxs():
     worksheet = workbook.add_worksheet()
     bold = workbook.add_format({'bold': True})
     header_date_format = workbook.add_format()
+    empty_format = workbook.add_format()
+
+    negative_format = workbook.add_format()
+    negative_format.set_bg_color('#ff4444')
+
+    positive_format = workbook.add_format()
+    positive_format.set_bg_color('#00C851')
+
+    zero_format = workbook.add_format()
+    zero_format.set_bg_color('#ffbb33')
+
     merge_format = workbook.add_format()
     merge_format.set_align('center')
     user_format = workbook.add_format()
@@ -113,7 +124,10 @@ def write_to_xlxs():
         worksheet.write(row, col, day, header_date_format)
         col += 1
 
-    worksheet.write(row, col, 'Итого', header_date_format)
+    worksheet.write(row, col, 'Общее кол-во часов', header_date_format)
+    worksheet.write(row, col + 1, 'Общее кол-во часов за тек. месяц', header_date_format)
+    worksheet.write(row, col + 2, 'Отработано', header_date_format)
+    worksheet.write(row, col + 3, 'Разница', header_date_format)
 
     companies = []
     row = 1
@@ -137,10 +151,28 @@ def write_to_xlxs():
             else:
                 start, end = None, None
             value = calculate_work_hours(start, end)
-            total_hours += timedelta(seconds=value.total_seconds())
-            worksheet.write(row, col, str(value))
+            value = round(value.seconds / 3600, 2)
+            fmt = empty_format
+            
+            if value < 8 and not is_holiday(current_date.replace(day=int(day[3:5])), employee):
+                fmt = negative_format
+            elif value >= 8:
+                fmt = positive_format
+            elif is_holiday(current_date.replace(day=int(day[3:5])), employee):
+                fmt = zero_format
+            worksheet.write(row, col, str(value), fmt)
             col += 1
-        worksheet.write(row, col, str(total_hours))
+
+        total_hours_till_today = calculate_total_hours(current_date, day_till=current_date.day, employee=employee)
+        total_hours_for_month = calculate_total_hours(current_date, employee=employee)
+        worked_hours = get_worked_hours(employee, date=current_date, day_till=current_date.day)
+        diff_hours = round(total_hours_till_today - worked_hours, 2)
+
+        worksheet.write(row, col, total_hours_till_today, zero_format)
+        worksheet.write(row, col + 1, total_hours_for_month, zero_format)
+        worksheet.write(row, col + 2, worked_hours, positive_format)
+        fmt = positive_format if diff_hours <= 0 else negative_format
+        worksheet.write(row, col + 3, diff_hours * -1, fmt)
         col = 2
         row += 1
 

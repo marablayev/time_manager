@@ -142,7 +142,7 @@ STATIC_ROOT = os.getenv("STATIC_ROOT", os.path.join(BASE_DIR, "static/"))
 MEDIA_URL = os.getenv("MEDIA_URL", "/api/media/")
 MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(BASE_DIR, "media/"))
 
-BOT_TOKEN = os.getenv('BOT_TOKEN', '1232155845:AAFEignycThAIIYzxZocHjUKC9NyhpgGO2w')
+BOT_TOKEN = os.getenv('BOT_TOKEN', '1232155845:AAFGwD2V-7Hamu3NM-_hCjjgQPZ9CW_PQAk')
 
 
 CRONJOBS = [

@@ -9,6 +9,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from bot.models import OTP
 from bot.utils import verify_otp, send_otp
 from time_management.utils import get_stats
+from time_management.models import Vacation
 from .models import Employee, Company
 
 
@@ -26,6 +27,12 @@ class EmployeeSerializer(serializers.ModelSerializer):
     def get_time_stats(self, obj):
         stats = get_stats([obj])
         return stats[0]
+
+
+class VacationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vacation
+        fields = ('__all__')
 
 
 class CompanySerializer(serializers.ModelSerializer):
