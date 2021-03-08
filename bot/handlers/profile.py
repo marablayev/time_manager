@@ -27,9 +27,9 @@ class ProfileHandler:
             CommandHandler('start', self.start),
             MessageHandler(Filters.regex(f'^Главное меню$'), self.start),
             MessageHandler(Filters.regex(f'^Моя статистика$'), self.stats_page),
-            MessageHandler(Filters.regex(f'^Мои события$'), self.my_events),
-            MessageHandler(Filters.regex(f'^Мои задачи$'), self.my_tasks),
-            MessageHandler(Filters.regex(f'^Новости$'), self.my_news),
+            MessageHandler(Filters.regex(f'^События$'), self.events_page),
+            MessageHandler(Filters.regex(f'^Задачи$'), self.tasks_page),
+            MessageHandler(Filters.regex(f'^Новости$'), self.news_page),
             CallbackQueryHandler(self.render_main_menu, pattern='^profile_back_button$'),
         ]
 

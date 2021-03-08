@@ -16,6 +16,14 @@
       "message": "Закончить рабочий день"
   },
   {
+      "code": "pause_shift_button",
+      "message": "Сделать перерыв"
+  },
+  {
+      "code": "continue_shift_button",
+      "message": "Продолжить рабочий день"
+  },
+  {
       "code": "my_stats_button",
       "message": "Моя статистика"
   },
@@ -65,6 +73,14 @@
       "message": "Вы начали рабочий день. Удачи!:)"
   },
   {
+      "code": "paused_day_reply",
+      "message": "У вас перерыв."
+  },
+  {
+      "code": "continued_day_reply",
+      "message": "Вы закончили перерыв."
+  },
+  {
       "code": "successful_finished_reply",
       "message": "Спасибо за службу. Иди домой и отдохни!"
   },
@@ -103,6 +119,14 @@
   {
       "code": "no_events_reply",
       "message": "У вас нет событий"
+  },
+  {
+      "code": "no_newss_reply",
+      "message": "У вас нет новостей"
+  },
+  {
+      "code": "no_tasks_reply",
+      "message": "У вас нет задач"
   },
   {
       "code": "events_received_reply",

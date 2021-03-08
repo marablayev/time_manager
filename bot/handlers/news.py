@@ -18,6 +18,8 @@ class NewsHandler:
     def get_news_handlers(self):
         return self.get_profile_handlers() + [
             CallbackQueryHandler(self.news_get, pattern='^news_item_get_(-?[0-9]+)$'),
+            CallbackQueryHandler(self.my_news, pattern='^my_news$'),
+            CallbackQueryHandler(self.invited_news, pattern='^invited_news$'),
         ]
 
     def news_notify(self, news, employees):
@@ -43,7 +45,33 @@ class NewsHandler:
             thread = Thread(target=method, args=args, kwargs=kwargs)
             thread.start()
 
+    def news_page(self, update, context):
+        text = "Выберите фильтр:"
+
+        markup = get_markup("my_news_markup")
+        update.message.reply_text(text, reply_markup=markup)
+        return self.NEWS_PAGE
+
     def my_news(self, update, context):
+        from news_management.models import News
+        if update.callback_query:
+            query = update.callback_query
+            query.answer()
+            chat = query.message.chat
+        else:
+            chat = update.message.chat
+
+        employee = Employee.objects.filter(chat_id=chat.id).first()
+        newss = News.objects.filter(employee=employee).distinct()
+        if not newss.exists():
+            msg = query.edit_message_text(
+                self.reply_manager.get_message('no_newss_reply'), parse_mode='HTML',)
+            return
+
+        self.render_news(chat.id, context, newss)
+        return self.NEWS_PAGE
+
+    def invited_news(self, update, context):
         from news_management.models import News
         if update.callback_query:
             query = update.callback_query
@@ -55,7 +83,7 @@ class NewsHandler:
         employee = Employee.objects.filter(chat_id=chat.id).first()
         newss = News.objects.filter(Q(employees_to_notify=employee) | Q(all_employees=True)).distinct()
         if not newss.exists():
-            msg = update.message.reply_text(
+            msg = query.edit_message_text(
                 self.reply_manager.get_message('no_newss_reply'), parse_mode='HTML',)
             return
 

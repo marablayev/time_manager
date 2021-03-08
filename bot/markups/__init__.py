@@ -24,10 +24,10 @@ def profile_page():
         [
             KeyboardButton('Главное меню')],
         [
-            KeyboardButton('Моя статистика'), KeyboardButton('Мои события')
+            KeyboardButton('Моя статистика'), KeyboardButton('События')
         ],
         [
-            KeyboardButton('Новости'), KeyboardButton('Мои задачи')]
+            KeyboardButton('Новости'), KeyboardButton('Задачи')]
     ]
 
     markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -172,6 +172,33 @@ def absence_markup(excuses):
         [
             InlineKeyboardButton(excuse.name, callback_data=f'absence_excuse_{excuse.id}')
         ] for excuse in excuses
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+def my_events_markup() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Мои события", callback_data=f'my_events')],
+        [InlineKeyboardButton("Приглашения", callback_data=f'invited_events')],
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+def my_tasks_markup() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Созданные мной", callback_data=f'my_tasks')],
+        [InlineKeyboardButton("Мои Задачи", callback_data=f'invited_tasks')],
+    ]
+
+    markup = InlineKeyboardMarkup(keyboard)
+    return markup
+
+def my_news_markup() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Мои Новости", callback_data=f'my_news')],
+        [InlineKeyboardButton("Новости компании", callback_data=f'invited_news')],
     ]
 
     markup = InlineKeyboardMarkup(keyboard)

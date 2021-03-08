@@ -18,21 +18,22 @@ class TimeManagementHandler:
     def get_time_management_handlers(self):
         start_text = self.reply_manager.get_message('start_shift_button')
         finish_text = self.reply_manager.get_message('finish_shift_button')
+        pause_text = self.reply_manager.get_message('pause_shift_button')
+        continue_text = self.reply_manager.get_message('continue_shift_button')
         absent_text = self.reply_manager.get_message('absent_button')
         make_action_text = self.reply_manager.get_message('make_action_button')
         profile_text = self.reply_manager.get_message('profile_button')
 
         return [
             CommandHandler('start', self.start),
-            MessageHandler(Filters.regex(f'^({start_text})|({finish_text})$'), self.start_shift),
+            MessageHandler(Filters.regex(f'^({start_text})|({finish_text})|({pause_text})|({continue_text})$'), self.start_shift),
             MessageHandler(Filters.regex(f'^({absent_text})$'), self.absent_today),
             MessageHandler(Filters.regex(f'^({make_action_text})$'), self.actions_page),
             MessageHandler(Filters.regex(f'^({profile_text})$'), self.profile_page),
         ]
 
     def get_starting_shift_handlers(self):
-        return [
-            CommandHandler('start', self.start),
+        return self.get_time_management_handlers() + [
             CallbackQueryHandler(self.now_selected, pattern='^now_selected$'),
         ]
 
@@ -46,6 +47,7 @@ class TimeManagementHandler:
 
         current_date = timezone.localdate()
         employee = Employee.objects.filter(chat_id=chat.id).first()
+        context.user_data['new_shift_state'] = update.message.text
 
         activity, _ = EmployeeActivity.objects.get_or_create(
                             employee=employee, date=current_date)
@@ -75,9 +77,22 @@ class TimeManagementHandler:
                             employee=employee, date=current_date)
 
         resp_text = self.reply_manager.get_message('successful_started_reply')
-        if activity.status != ActivityStatus.WORKING:
+
+        new_state = context.user_data['new_shift_state']
+        start_text = self.reply_manager.get_message('start_shift_button')
+        finish_text = self.reply_manager.get_message('finish_shift_button')
+        pause_text = self.reply_manager.get_message('pause_shift_button')
+        continue_text = self.reply_manager.get_message('continue_shift_button')
+
+        if activity.status != ActivityStatus.WORKING and new_state == start_text:
             activity.start_time = current_time.time()
             activity.status = ActivityStatus.WORKING
+        elif activity.status == ActivityStatus.WORKING and new_state == pause_text:
+            activity.status = ActivityStatus.PAUSED
+            resp_text = self.reply_manager.get_message('paused_day_reply')
+        elif activity.status == ActivityStatus.PAUSED and new_state == continue_text:
+            activity.status = ActivityStatus.WORKING
+            resp_text = self.reply_manager.get_message('continued_day_reply')
         else:
             activity.finish_time = current_time.time()
             activity.status = ActivityStatus.FINISHED
